@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jobs — Creative Hub</title>
+  <link rel="icon" href="assets/logos/favicon_master.svg" />
+  <link rel="stylesheet" href="assets/styles.css" />
+  <script src="assets/app.js" defer></script>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html" aria-label="Quantum Creative Hub" style="display:flex;align-items:center;gap:12px;">
+        <img src="assets/logos/quantum_logo_master_blue.svg" alt="Quantum" />
+        <span style="color:var(--chrome-dark-40);">|</span>
+        <span style="font-weight:600;color:var(--muted);font-size:0.95rem;">Creative Hub</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="jobs.html" class="active">Jobs</a>
+        <a href="data.html">Data</a>
+        <a class="nav-cta" href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <section class="hero compact">
+      <div class="eyebrow"><span class="dot"></span> Jobs</div>
+      <h1>What we're making, and what we've shipped.</h1>
+      <p class="lead">Everything in flight and everything recently delivered, in one view. These update automatically as jobs move through the studio.</p>
+    </section>
+
+    <!-- In progress -->
+    <div class="section-head">
+      <h2>In progress</h2>
+      <div class="head-right">
+        <span class="meta" id="count-progress"></span>
+        <a class="btn-mini" href="https://trello.com/b/nQsWDZPA/creative-team" target="_blank" rel="noopener">Open Trello board ↗</a>
+      </div>
+    </div>
+    <div class="table-card scroll">
+      <table class="jt">
+        <colgroup><col style="width:28%"><col style="width:11%"><col style="width:16%"><col style="width:15%"><col style="width:15%"><col style="width:15%"></colgroup>
+        <thead id="ip-head"></thead><tbody id="progress-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Delivered -->
+    <div class="section-head acc-green">
+      <h2>Delivered</h2>
+      <span class="meta" id="count-delivered"></span>
+    </div>
+
+    <div class="dfilter">
+      <div class="dfilter-bar">
+        <div class="search">
+          <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="search" id="f-search" placeholder="Search jobs, brands, stakeholders…" aria-label="Search delivered jobs" />
+        </div>
+        <span id="ms-brand"></span>
+        <span id="ms-channel"></span>
+        <span id="ms-type"></span>
+        <select id="f-date" class="dselect" aria-label="Filter by delivered date">
+          <option value="">Any date</option>
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 90 days</option>
+          <option value="365">Last 12 months</option>
+        </select>
+      </div>
+      <div class="dfilter-active" id="active-filters"></div>
+    </div>
+
+    <div class="table-card scroll">
+      <table class="jt">
+        <colgroup><col style="width:9%"><col style="width:12%"><col style="width:20%"><col style="width:18%"><col style="width:8%"><col style="width:8%"><col style="width:13%"><col style="width:12%"></colgroup>
+        <thead id="dv-head"></thead><tbody id="delivered-body"></tbody>
+      </table>
+    </div>
+    <p style="margin-top:12px;color:var(--muted);font-size:0.82rem;">Scroll within a table to see all rows · search and filters are live · click a column to sort · hover a Multi-brand chip for the full list.</p>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <span>Quantum Creative Hub</span>
+      <span>Internal use only · V1.01</span>
+    </div>
+  </footer>
+
+  <script>
+    const DATA_URL = 'https://script.google.com/macros/s/AKfycbz10YPP7Fk9U_Y-WXpAuRXsvrBU4mWvNlfU9jXVY1pB2g8e9Y2pVlc7gZLv8E5Y5FtWXQ/exec';
+
+    let INPROGRESS = [], DELIVERED = [], META = {};
+    const F = { brand: new Set(), channel: new Set(), type: new Set(), date: '', q: '' };
+    const DROPDOWNS = [];
+    let ipSort = { key: 'due', dir: 'asc' };
+    let dvSort = { key: 'date', dir: 'desc' };
+
+    // ----- helpers -----
+    const codeOf = s => { const i = s.indexOf(' - '); return (i > -1 ? s.slice(0, i) : s).trim(); };
+    const cells = s => String(s || '').split(',').map(x => x.trim()).filter(Boolean);
+    const brandVals = j => cells(j.brand).map(codeOf).map(c => c === 'CAS' ? 'CBK' : c);
+    const numJN = s => parseInt(String(s || '').replace(/\D/g, ''), 10) || 0;
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+
+    const EXT = '<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>';
+    const FOLDER = '<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>';
+    const LAYERS = '<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>';
+
+    function brandCell(j) {
+      const codes = brandVals(j);
+      if (!codes.length) return '—';
+      if (codes.length === 1) { const c = codes[0], m = META[c] || {}; return `<span class="brandcell">${m.flag ? m.flag + ' ' : ''}${esc(c)}</span>`; }
+      return `<span class="mbrand" data-codes="${esc(codes.join(','))}">${LAYERS}Multi-brand <span class="cnt">${codes.length}</span></span>`;
+    }
+    const jnLink = j => j.trelloUrl ? `<a class="jnlink" href="${j.trelloUrl}" target="_blank" rel="noopener">${esc(j.jobNumber)} ${EXT}</a>` : esc(j.jobNumber);
+    const STATUS_CLS = { 'Overdue': 'overdue', 'Pending': 'pending', 'In progress': 'progress' };
+    const statusBadge = j => `<span class="badge ${STATUS_CLS[j.status] || 'progress'}">${esc(j.status || 'In progress')}</span>`;
+    const viewBtn = url => (url && url !== '#') ? `<a class="viewbtn" href="${url}" target="_blank" rel="noopener">${FOLDER}View</a>` : '—';
+
+    // ----- columns -----
+    const IP_COLS = [
+      { key: 'title', label: 'Title', sortable: true, sort: j => (j.title || '').toLowerCase(), cell: j => esc(j.title || '—'), title: j => j.title },
+      { key: 'job', label: 'Job', sortable: true, sort: j => numJN(j.jobNumber), cell: jnLink },
+      { key: 'brand', label: 'Brand(s)', sortable: true, sort: j => (brandVals(j)[0] || ''), cell: brandCell },
+      { key: 'owner', label: 'Owner', sortable: true, sort: j => (j.owner || '').toLowerCase(), cell: j => esc(j.owner || '—') },
+      { key: 'due', label: 'Due date', sortable: true, sort: j => j.dueISO || '', cell: j => esc(j.due || '—') },
+      { key: 'status', label: 'Status', sortable: true, sort: j => j.status || '', cell: statusBadge }
+    ];
+    const DV_COLS = [
+      { key: 'job', label: 'Job', sortable: true, sort: j => numJN(j.jobNumber), cell: jnLink },
+      { key: 'brand', label: 'Brand(s)', sortable: true, sort: j => (brandVals(j)[0] || ''), cell: brandCell },
+      { key: 'channel', label: 'Channel', sortable: true, sort: j => (j.channel || '').toLowerCase(), cell: j => esc(j.channel || '—'), title: j => j.channel },
+      { key: 'stakeholder', label: 'Stakeholder', sortable: true, sort: j => (j.stakeholder || '').toLowerCase(), cell: j => esc(j.stakeholder || '—'), title: j => j.stakeholder },
+      { key: 'assets', label: 'Assets', sortable: true, num: true, sort: j => j.assets == null ? -1 : +j.assets, cell: j => (j.assets == null ? '—' : j.assets) },
+      { key: 'hours', label: 'Hours', sortable: true, num: true, sort: j => j.hours == null ? -1 : +j.hours, cell: j => (j.hours == null ? '—' : (+j.hours).toFixed(2)) },
+      { key: 'date', label: 'Date', sortable: true, sort: j => j.deliveredISO || '', cell: j => esc(j.delivered || '—') },
+      { key: 'link', label: 'Link', sortable: false, cell: j => viewBtn(j.deliveryUrl) }
+    ];
+
+    function renderTable(headId, bodyId, cols, rows, state, onSort) {
+      document.getElementById(headId).innerHTML = '<tr>' + cols.map(c => {
+        if (!c.sortable) return `<th class="${c.num ? 'num' : ''}">${c.label}</th>`;
+        const active = state.key === c.key;
+        const arr = active ? (state.dir === 'asc' ? '▲' : '▼') : '↕';
+        return `<th class="sortable ${active ? 'sorted' : ''} ${c.num ? 'num' : ''}" data-key="${c.key}">${c.label}<span class="arr">${arr}</span></th>`;
+      }).join('') + '</tr>';
+
+      let r = rows.slice();
+      if (state.key) {
+        const col = cols.find(c => c.key === state.key), dir = state.dir === 'asc' ? 1 : -1;
+        r.sort((a, b) => { const x = col.sort(a), y = col.sort(b); return (typeof x === 'string' && typeof y === 'string') ? x.localeCompare(y) * dir : (x < y ? -1 : x > y ? 1 : 0) * dir; });
+      }
+      document.getElementById(bodyId).innerHTML = r.length
+        ? r.map(j => '<tr>' + cols.map(c => `<td class="nowrap ${c.num ? 'num' : ''}"${c.title ? ' title="' + esc(c.title(j)) + '"' : ''}>${c.cell(j)}</td>`).join('') + '</tr>').join('')
+        : `<tr><td class="empty" colspan="${cols.length}">Nothing to show.</td></tr>`;
+
+      document.getElementById(headId).querySelectorAll('th.sortable').forEach(th => th.addEventListener('click', () => {
+        const k = th.dataset.key;
+        if (state.key === k) state.dir = state.dir === 'asc' ? 'desc' : 'asc';
+        else { state.key = k; const col = cols.find(c => c.key === k); state.dir = (col.num || k === 'date' || k === 'due') ? 'desc' : 'asc'; }
+        onSort();
+      }));
+    }
+
+    // ----- In progress -----
+    function renderInProgress() {
+      const pend = INPROGRESS.filter(j => j.status === 'Pending').length;
+      const live = INPROGRESS.length - pend;
+      document.getElementById('count-progress').textContent = live + ' in progress · ' + pend + ' pending';
+      renderTable('ip-head', 'progress-body', IP_COLS, INPROGRESS, ipSort, renderInProgress);
+    }
+
+    // ----- Delivered filter + table -----
+    const VAL = { brand: brandVals, channel: j => cells(j.channel), type: j => (j.assetType ? [j.assetType.trim()] : []) };
+    const uniqueValues = getVals => { const s = new Set(); DELIVERED.forEach(j => getVals(j).forEach(v => s.add(v))); return [...s].sort(); };
+
+    function makeDropdown(mountId, label, key) {
+      const values = uniqueValues(VAL[key]);
+      const mount = document.getElementById(mountId);
+      const dd = document.createElement('div'); dd.className = 'dd';
+      const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'dd-btn';
+      const relabel = () => { const n = F[key].size; btn.innerHTML = label + (n ? ' <span class="count">' + n + '</span>' : '') + ' <span class="caret">▾</span>'; btn.classList.toggle('active', n > 0); };
+      const panel = document.createElement('div'); panel.className = 'dd-panel';
+      if (!values.length) { const e = document.createElement('div'); e.className = 'dd-empty'; e.textContent = 'No options'; panel.appendChild(e); }
+      values.forEach(v => {
+        const opt = document.createElement('label'); opt.className = 'dd-opt';
+        const cb = document.createElement('input'); cb.type = 'checkbox'; cb.dataset.value = v; cb.checked = F[key].has(v);
+        cb.addEventListener('change', () => { cb.checked ? F[key].add(v) : F[key].delete(v); relabel(); renderDelivered(); });
+        const sp = document.createElement('span'); sp.textContent = v;
+        opt.appendChild(cb); opt.appendChild(sp); panel.appendChild(opt);
+      });
+      btn.addEventListener('click', e => { e.stopPropagation(); document.querySelectorAll('.dd.open').forEach(x => { if (x !== dd) x.classList.remove('open'); }); dd.classList.toggle('open'); });
+      panel.addEventListener('click', e => e.stopPropagation());
+      dd.appendChild(btn); dd.appendChild(panel); mount.appendChild(dd);
+      relabel();
+      DROPDOWNS.push({ key, relabel, panel });
+    }
+    function syncChecks() { DROPDOWNS.forEach(d => { d.panel.querySelectorAll('input[type=checkbox]').forEach(cb => { cb.checked = F[d.key].has(cb.dataset.value); }); d.relabel(); }); }
+
+    const DATE_LABEL = { '7': 'Last 7 days', '30': 'Last 30 days', '90': 'Last 90 days', '365': 'Last 12 months' };
+    function passes(j) {
+      for (const key of ['brand', 'channel', 'type']) { if (F[key].size && !VAL[key](j).some(v => F[key].has(v))) return false; }
+      if (F.date) { const cutoff = Date.now() - Number(F.date) * 86400000; const t = j.deliveredISO ? new Date(j.deliveredISO).getTime() : NaN; if (isNaN(t) || t < cutoff) return false; }
+      if (F.q) { const hay = [j.jobNumber, VAL.brand(j).join(' '), j.brand, j.channel, j.assetType, j.stakeholder].join(' ').toLowerCase(); if (!hay.includes(F.q)) return false; }
+      return true;
+    }
+    function clearAll() {
+      F.brand.clear(); F.channel.clear(); F.type.clear(); F.date = ''; F.q = '';
+      document.getElementById('f-date').value = ''; document.getElementById('f-search').value = '';
+      syncChecks(); renderDelivered();
+    }
+    function renderActive(shown, total) {
+      const wrap = document.getElementById('active-filters');
+      const pills = [];
+      ['brand', 'channel', 'type'].forEach(key => F[key].forEach(v => pills.push({ key, v })));
+      if (F.date) pills.push({ key: 'date', v: F.date, label: DATE_LABEL[F.date] || F.date });
+      let html = pills.map(p => `<button class="pill" data-key="${p.key}" data-v="${encodeURIComponent(p.v)}">${p.label || p.v}<span class="x">×</span></button>`).join('');
+      if (pills.length) html += '<button class="clear-all" id="clear-all">Clear all</button>';
+      html += `<span class="result-count">${shown} of ${total}</span>`;
+      wrap.innerHTML = html;
+      wrap.querySelectorAll('.pill').forEach(el => el.addEventListener('click', () => {
+        const key = el.dataset.key, v = decodeURIComponent(el.dataset.v);
+        if (key === 'date') { F.date = ''; document.getElementById('f-date').value = ''; } else F[key].delete(v);
+        syncChecks(); renderDelivered();
+      }));
+      const ca = document.getElementById('clear-all'); if (ca) ca.addEventListener('click', clearAll);
+    }
+    function renderDelivered() {
+      const rows = DELIVERED.filter(passes);
+      renderTable('dv-head', 'delivered-body', DV_COLS, rows, dvSort, renderDelivered);
+      renderActive(rows.length, DELIVERED.length);
+    }
+
+    document.addEventListener('click', () => document.querySelectorAll('.dd.open').forEach(x => x.classList.remove('open')));
+
+    // Multi-brand tooltip (floats on <body>, so it isn't clipped by the table)
+    const brandTip = document.createElement('div'); brandTip.className = 'brandtip'; document.body.appendChild(brandTip);
+    function showBrandTip(chip) {
+      const codes = (chip.dataset.codes || '').split(',').filter(Boolean);
+      brandTip.innerHTML = codes.map(c => {
+        const m = META[c] || {};
+        return `<div class="tt-row"><span>${m.flag || ''}</span><span class="tt-code">${esc(c)}</span>${m.name ? `<span class="tt-name">${esc(m.name)}</span>` : ''}</div>`;
+      }).join('');
+      brandTip.style.display = 'block';
+      const r = chip.getBoundingClientRect(), t = brandTip.getBoundingClientRect();
+      let top = r.top - t.height - 8; if (top < 8) top = r.bottom + 8;
+      let left = Math.max(8, Math.min(r.left + r.width / 2 - t.width / 2, window.innerWidth - t.width - 8));
+      brandTip.style.top = top + 'px'; brandTip.style.left = left + 'px';
+    }
+    document.addEventListener('mouseover', e => { const c = e.target.closest('.mbrand'); if (c) showBrandTip(c); });
+    document.addEventListener('mouseout', e => { const c = e.target.closest('.mbrand'); if (c) brandTip.style.display = 'none'; });
+    window.addEventListener('scroll', () => { brandTip.style.display = 'none'; }, true);
+
+    async function load() {
+      document.getElementById('progress-body').innerHTML = '<tr><td colspan="6" class="loading">Loading</td></tr>';
+      document.getElementById('delivered-body').innerHTML = '<tr><td colspan="8" class="loading">Loading</td></tr>';
+      let data;
+      try { const res = await fetch(DATA_URL, { cache: 'no-store' }); data = await res.json(); }
+      catch (e) {
+        document.getElementById('progress-body').innerHTML = '<tr><td colspan="6">Could not load the jobs feed.</td></tr>';
+        document.getElementById('delivered-body').innerHTML = '<tr><td colspan="8">Could not load the jobs feed.</td></tr>';
+        return;
+      }
+      INPROGRESS = data.inProgress || [];
+      DELIVERED = data.delivered || [];
+      META = data.brandMeta || {};
+      document.getElementById('count-delivered').textContent = 'Last ' + DELIVERED.length + ' delivered';
+
+      renderInProgress();
+      makeDropdown('ms-brand', 'Brand', 'brand');
+      makeDropdown('ms-channel', 'Channel', 'channel');
+      makeDropdown('ms-type', 'Asset type', 'type');
+      document.getElementById('f-search').addEventListener('input', e => { F.q = e.target.value.trim().toLowerCase(); renderDelivered(); });
+      document.getElementById('f-date').addEventListener('change', e => { F.date = e.target.value; renderDelivered(); });
+      renderDelivered();
+    }
+    load();
+  </script>
+</body>
+</html>

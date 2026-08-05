@@ -3,79 +3,200 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Creative Hub — deployment test</title>
-  <style>
-    :root {
-      --quantum-blue: #0086ff;
-      --ink: #0a0e14;
-      --muted: #5b6472;
-      --line: #e6e9ef;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      background: var(--ink);
-      color: #fff;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-    .card {
-      background: #11161f;
-      border: 1px solid #1c2430;
-      border-radius: 16px;
-      max-width: 560px;
-      width: 100%;
-      padding: 48px 40px;
-      text-align: center;
-    }
-    .mark {
-      width: 56px; height: 56px;
-      margin: 0 auto 28px;
-      border-radius: 12px;
-      background: var(--quantum-blue);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 26px; color: #fff;
-    }
-    .status {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: 13px; letter-spacing: .04em; text-transform: uppercase;
-      color: var(--quantum-blue); margin-bottom: 18px;
-    }
-    .dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--quantum-blue);
-      box-shadow: 0 0 0 0 rgba(0,134,255,.6);
-      animation: pulse 1.8s infinite;
-    }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(0,134,255,.6); }
-      70% { box-shadow: 0 0 0 10px rgba(0,134,255,0); }
-      100% { box-shadow: 0 0 0 0 rgba(0,134,255,0); }
-    }
-    h1 { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
-    p { color: #9aa4b2; font-size: 15px; line-height: 1.6; }
-    .meta {
-      margin-top: 28px; padding-top: 24px; border-top: 1px solid #1c2430;
-      font-size: 13px; color: #6b7484;
-    }
-    .meta strong { color: #c7cfda; font-weight: 600; }
-  </style>
+  <title>Creative Hub — Quantum</title>
+  <link rel="icon" href="assets/logos/favicon_master.svg" />
+  <link rel="stylesheet" href="assets/styles.css" />
+  <script src="assets/app.js" defer></script>
 </head>
 <body>
-  <main class="card">
-    <div class="mark">Q</div>
-    <div class="status"><span class="dot"></span> Deployment live</div>
-    <h1>Creative Hub test page</h1>
-    <p>If you can see this, the site is building and serving correctly on Coolify. This is a placeholder — the real Hub replaces it next.</p>
-    <div class="meta">
-      Served as a static site &middot; <strong id="ts">loading…</strong>
+  <!-- ===== Top nav (same on every page) ===== -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html" aria-label="Quantum Creative Hub" style="display:flex;align-items:center;gap:12px;">
+        <img src="assets/logos/quantum_logo_master_blue.svg" alt="Quantum" />
+        <span style="color:var(--chrome-dark-40);">|</span>
+        <span style="font-weight:600;color:var(--muted);font-size:0.95rem;">Creative Hub</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html" class="active">Home</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="data.html">Data</a>
+        <a class="nav-cta" href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <!-- ===== Hero — Master Blue field, Blue leads ===== -->
+    <section class="hero">
+      <img class="hero-mark" src="assets/logos/favicon_master.svg" alt="" aria-hidden="true" />
+      <div class="eyebrow"><span class="dot"></span> Creative Hub</div>
+      <h1>Welcome to the Quantum Creative Hub, your one stop shop for all things creative!</h1>
+      <p class="lead">Brief in new work, follow jobs, and see how the studio is performing.</p>
+      <div class="btn-row">
+        <a class="btn btn-rose" href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
+        <a class="btn btn-ghost-blue" href="data.html">See studio data</a>
+      </div>
+    </section>
+
+    <!-- ===== Quick links ===== -->
+    <div class="section-head acc-rose"><h2>Where to start</h2></div>
+    <div class="grid grid-3" id="quicklinks">
+      <a class="card link" href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </div>
+        <h3>Brief in work</h3>
+        <p>Start a new project. Tell us what you need and we route it to the right people.</p>
+        <span class="card-arrow">Open the brief ↗</span>
+      </a>
+      <a class="card link" href="data.html">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+        </div>
+        <h3>Studio data</h3>
+        <p>Live numbers on projects, briefs, and delivery — updated automatically.</p>
+        <span class="card-arrow">View the data →</span>
+      </a>
+      <div class="card">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </div>
+        <h3>More soon</h3>
+        <p>Projects, updates and references are on the way. This is version one — we grow it from here.</p>
+        <span class="card-arrow" style="color:var(--muted);">Coming next</span>
+      </div>
+    </div>
+
+    <!-- ===== At a glance ===== -->
+    <div class="section-head acc-orange"><h2>At a glance</h2><span class="meta" id="glance-meta"></span></div>
+    <div class="grid grid-4" id="glance">
+      <div class="card stat"><div class="stat-value">…</div><div class="stat-label">Loading</div></div>
     </div>
   </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <span>Quantum Creative Hub</span>
+      <span>Internal use only · V1.01</span>
+    </div>
+  </footer>
+
   <script>
-    document.getElementById('ts').textContent = new Date().toLocaleString();
+    const DATA_URL = 'https://script.google.com/macros/s/AKfycbz10YPP7Fk9U_Y-WXpAuRXsvrBU4mWvNlfU9jXVY1pB2g8e9Y2pVlc7gZLv8E5Y5FtWXQ/exec';
+
+    function delta(last, prev, inverse, prevLabel) {
+      if (!prev) return '';
+      const diff = last - prev;
+      const p = Math.round(diff / prev * 100);
+      const good = inverse ? diff < 0 : diff > 0;
+      const cls = diff === 0 ? 'flat' : (good ? 'up' : 'down');
+      const arrow = diff > 0 ? '▲' : (diff < 0 ? '▼' : '–');
+      return `<div class="stat-delta ${cls}">${arrow} ${Math.abs(p)}% vs ${prevLabel || 'prev'}</div>`;
+    }
+    const card = (value, label, deltaHtml) =>
+      `<div class="card stat"><div class="stat-value">${value}</div><div class="stat-label">${label}</div>${deltaHtml || ''}</div>`;
+    const cardText = (value, label, deltaHtml) =>
+      `<div class="card stat"><div class="stat-value text">${value}</div><div class="stat-label">${label}</div>${deltaHtml || ''}</div>`;
+    const textOn = (hex) => {
+      const c = hex.replace('#', '');
+      const r = parseInt(c.substr(0, 2), 16), g = parseInt(c.substr(2, 2), 16), b = parseInt(c.substr(4, 2), 16);
+      return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.62 ? '#0a0e12' : '#ffffff';
+    };
+    const brandBadge = (code, meta) => {
+      if (!code) return '—';
+      const m = meta[code] || {};
+      const flag = m.flag ? ' ' + m.flag : '';
+      if (!m.colour) return code + flag;
+      return `<span class="bbadge" style="background:${m.colour};color:${textOn(m.colour)}">${code}${flag}</span>`;
+    };
+
+    const codeOf = s => { const i = s.indexOf(' - '); return (i > -1 ? s.slice(0, i) : s).trim(); };
+    const cellsOf = s => String(s || '').split(',').map(x => x.trim()).filter(Boolean);
+    const brandCodesOf = j => cellsOf(j.brand).map(codeOf).map(c => c === 'CAS' ? 'CBK' : c);
+    const brandChip = (code, meta) => {
+      if (!code) return '—';
+      const m = meta[code] || {};
+      if (!m.colour) return code;
+      return `<span class="bchip" style="background:${m.colour};color:${textOn(m.colour)}">${code}${m.flag ? ' ' + m.flag : ''}</span>`;
+    };
+
+    function renderRecent(delivered, meta) {
+      const el = document.getElementById('recent');
+      const rows = (delivered || []).slice(0, 6);
+      if (!rows.length) { el.innerHTML = '<div class="card"><p style="color:var(--muted);margin:0;">No delivered jobs yet.</p></div>'; return; }
+      el.innerHTML = rows.map(j => {
+        const code = brandCodesOf(j)[0] || '';
+        const job = j.trelloUrl ? `<a href="${j.trelloUrl}" target="_blank" rel="noopener">${j.jobNumber || ''}</a>` : (j.jobNumber || '');
+        return `<div class="card recent">
+          <div class="recent-top">${brandChip(code, meta)}<span class="recent-date">${j.delivered || ''}</span></div>
+          <div class="recent-job">${job}</div>
+          <div class="recent-stake">${j.stakeholder || ''}</div>
+        </div>`;
+      }).join('');
+    }
+
+    function renderBrands(meta) {
+      const el = document.getElementById('brandgrid');
+      const codes = Object.keys(meta || {});
+      if (!codes.length) { el.innerHTML = ''; document.getElementById('brands-meta').textContent = ''; return; }
+      const verts = new Set(codes.map(c => meta[c].vertical));
+      document.getElementById('brands-meta').textContent = codes.length + ' brands · ' + verts.size + ' verticals';
+      el.innerHTML = codes.map(c => {
+        const m = meta[c];
+        return `<div class="brand-tile"><div class="swatch" style="background:${m.colour}"></div><div class="bt-body"><div class="bt-code">${m.flag || ''} ${c}</div><div class="bt-name">${m.name || ''}</div><div class="bt-vert">${m.vertical || ''}</div></div></div>`;
+      }).join('');
+    }
+
+    // "was X in Jun" style comparison for top-category tiles
+    const catDelta = (top, prevTop, pl) => {
+      if (!prevTop) return '';
+      return prevTop === top ? '<div class="stat-delta flat">No change</div>' : `<div class="stat-delta flat">was ${prevTop} in ${pl}</div>`;
+    };
+    // percentage-point change for the split tile (neutral — no good/bad)
+    const ptsDelta = (last, prev, pl) => {
+      if (prev == null) return '';
+      const d = last - prev;
+      const arrow = d > 0 ? '▲' : (d < 0 ? '▼' : '–');
+      return `<div class="stat-delta flat">${arrow} ${Math.abs(d)}pts vs ${pl}</div>`;
+    };
+
+    // TEMP placeholder figures — used until the live stats feed is deployed, then it auto-switches to real data.
+    const PLACEHOLDER = {
+      activeJobs: 24,
+      jobsLast: 42, jobsPrev: 35,
+      assetsLast: 128, assetsPrev: 140,
+      minsPerAssetLast: 32, minsPerAssetPrev: 38,
+      topBrand: 'SLW UK', topBrandPrev: 'CBK',
+      topVertical: 'iGaming', topVerticalPrev: 'iGaming',
+      topTeam: 'Performance Marketing', topTeamPrev: 'CRM',
+      staticPctLast: 62, staticPctPrev: 57,
+      lastMonthLabel: 'Jul', prevMonthLabel: 'Jun'
+    };
+
+    async function loadGlance() {
+      let s, meta = {}, delivered = [];
+      try {
+        const r = await fetch(DATA_URL, { cache: 'no-store' });
+        const data = await r.json();
+        s = data.stats; meta = data.brandMeta || {}; delivered = data.delivered || [];
+      } catch (e) { s = null; }
+      if (!s || s.activeJobs === undefined) s = PLACEHOLDER;   // fall back to placeholders for testing
+      const pl = s.prevMonthLabel;
+      const n = v => (v === undefined || v === null) ? '—' : v;
+      document.getElementById('glance').innerHTML = [
+        card(n(s.activeJobs), 'Active jobs', ''),
+        card(n(s.jobsLast), 'Jobs delivered last month', delta(s.jobsLast, s.jobsPrev, false, pl)),
+        card(n(s.assetsLast), 'Assets delivered last month', delta(s.assetsLast, s.assetsPrev, false, pl)),
+        card(n(s.minsPerAssetLast), 'Mins per asset', delta(s.minsPerAssetLast, s.minsPerAssetPrev, true, pl)),
+        cardText(brandBadge(s.topBrand, meta), 'Most requested brand', catDelta(s.topBrand, s.topBrandPrev, pl)),
+        cardText(n(s.topVertical), 'Most requested vertical', catDelta(s.topVertical, s.topVerticalPrev, pl)),
+        cardText(n(s.topTeam), 'Most requested team', catDelta(s.topTeam, s.topTeamPrev, pl)),
+        cardText((s.staticPctLast != null ? s.staticPctLast + '% Static' : '—'), 'Static v Motion', ptsDelta(s.staticPctLast, s.staticPctPrev, pl))
+      ].join('');
+      document.getElementById('glance-meta').textContent = s.lastMonthLabel ? 'Last month: ' + s.lastMonthLabel : '';
+    }
+    loadGlance();
   </script>
 </body>
 </html>
