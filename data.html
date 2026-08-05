@@ -6,7 +6,6 @@
   <title>Data — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
   <link rel="stylesheet" href="assets/styles.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="assets/app.js" defer></script>
 </head>
 <body>
@@ -26,46 +25,127 @@
     </div>
   </nav>
 
-  <main class="wrap">
-    <section class="hero compact">
-      <div class="eyebrow"><span class="dot"></span> Data</div>
-      <h1>How the studio is performing.</h1>
-      <p class="lead">Delivered work broken down by month, brand, vertical and team — read live from the Creative Task Tracker.</p>
-      <p class="meta" id="data-meta" style="margin-top:8px;">Loading the latest numbers…</p>
-      <!-- Note for later: financial year runs Oct–Sep, labelled by start year (e.g. FY25/26; Q1 = Oct–Dec). -->
-    </section>
-
-    <div class="chart-card">
-      <h3>Deliveries per month</h3>
-      <div class="sub">Jobs delivered, by month</div>
-      <div class="chart-holder tall"><div class="chart-loading">Loading</div><canvas id="c-month"></canvas></div>
-    </div>
-
-    <div class="grid grid-2" style="margin-top:20px;">
-      <div class="chart-card">
-        <h3>By brand</h3>
-        <div class="sub">Delivered jobs per brand</div>
-        <div class="chart-holder tall"><div class="chart-loading">Loading</div><canvas id="c-brand"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <h3>By vertical</h3>
-        <div class="sub">Share of delivered work</div>
-        <div class="chart-holder tall"><div class="chart-loading">Loading</div><canvas id="c-vert"></canvas></div>
-      </div>
-    </div>
-
-    <div class="grid grid-2" style="margin-top:20px;">
-      <div class="chart-card">
-        <h3>By team</h3>
-        <div class="sub">Requesting team / channel</div>
-        <div class="chart-holder tall"><div class="chart-loading">Loading</div><canvas id="c-team"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <h3>Static v Motion</h3>
-        <div class="sub">Asset type split</div>
-        <div class="chart-holder tall"><div class="chart-loading">Loading</div><canvas id="c-sm"></canvas></div>
+  <main class="banded">
+    <div class="band band-grey">
+      <div class="wrap">
+        <section class="hero compact hero-data">
+          <div class="hero-main">
+            <div class="eyebrow"><span class="dot"></span> Data</div>
+            <h1>How the studio is performing.</h1>
+            <p class="lead">Live picture of the work the creative team is delivering — hours, assets, departments, brands. Updates as new briefs come in.</p>
+            <div class="period-bar">
+              <span class="period-label">Period</span>
+              <div class="period-lens" id="period-lens">
+                <button type="button" data-lens="month">Month</button>
+                <button type="button" data-lens="quarter">Quarter</button>
+                <button type="button" data-lens="fy">FY</button>
+                <button type="button" data-lens="all">All time</button>
+              </div>
+              <div class="period-step" id="period-step">
+                <button type="button" class="pstep" id="pstep-prev" aria-label="Previous period">‹</button>
+                <span class="pstep-label" id="pstep-label">—</span>
+                <button type="button" class="pstep" id="pstep-next" aria-label="Next period">›</button>
+              </div>
+            </div>
+            <p class="meta period-count" id="period-count">Loading…</p>
+          </div>
+          <aside class="cmp-box" id="cmp-box"></aside>
+          <!-- FY runs Oct–Sep; FY26 = Oct 2025–Sep 2026; Q1 Oct–Dec … Q4 Jul–Sep. -->
+        </section>
       </div>
     </div>
+
+    <!-- Headlines / auto-generated insights -->
+    <div class="band band-white">
+      <div class="wrap">
+        <div class="section-head acc-rose">
+          <h2>The headlines</h2>
+          <span class="meta" id="hl-meta">Reading the tracker…</span>
+        </div>
+        <div class="grid grid-2" id="headlines">
+          <div class="hl-loading" style="grid-column:1/-1;">Surfacing insights</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Per-brand activity -->
+    <div class="band band-grey">
+      <div class="wrap">
+        <div class="section-head acc-orange">
+          <h2>Per-brand activity</h2>
+          <span class="meta">Multi-brand briefs split hours and assets evenly across constituent brands. Brand colours match their identity.</span>
+        </div>
+        <div class="grid grid-3" id="brand-callouts">
+          <div class="hl-loading" style="grid-column:1/-1;">Crunching the brands</div>
+        </div>
+        <div class="grid grid-3" id="brand-cols" style="margin-top:22px;">
+          <div class="brandcol"><h4>Briefs by brand</h4><div id="col-briefs"></div></div>
+          <div class="brandcol"><h4>Assets by brand</h4><div id="col-assets"></div></div>
+          <div class="brandcol"><h4>Hours by brand</h4><div id="col-hours"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Who's briefing -->
+    <div class="band band-white">
+      <div class="wrap">
+        <div class="section-head acc-green">
+          <h2>Who's briefing</h2>
+          <span class="meta">Briefs, assets, and hours ranked by stakeholder. Each brief counts once per stakeholder — no split attribution.</span>
+        </div>
+        <div class="grid grid-3" id="people-callouts">
+          <div class="hl-loading" style="grid-column:1/-1;">Counting stakeholders</div>
+        </div>
+        <div class="grid grid-3" id="people-cols" style="margin-top:22px;">
+          <div class="brandcol"><h4>Briefs by stakeholder</h4><div id="pc-briefs"></div></div>
+          <div class="brandcol"><h4>Assets by stakeholder</h4><div id="pc-assets"></div></div>
+          <div class="brandcol"><h4>Hours by stakeholder</h4><div id="pc-hours"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- By vertical -->
+    <div class="band band-grey">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>By vertical</h2>
+          <span class="meta">Where the team's time is going across the verticals we serve. Region totals below.</span>
+        </div>
+        <div id="varea"><div class="hl-loading">Grouping by vertical</div></div>
+        <div class="vregions" id="vregions"></div>
+      </div>
+    </div>
+
+    <!-- By department (channels) -->
+    <div class="band band-white">
+      <div class="wrap">
+        <div class="section-head acc-rose">
+          <h2>By department</h2>
+          <span class="meta">Hours and assets split across departments. Briefs spanning more than one are split evenly, same as multi-brand.</span>
+        </div>
+        <div class="grid grid-2" id="team-cols">
+          <div class="brandcol"><h4>Hours by department</h4><div id="tc-hours"><div class="hl-loading">Loading</div></div></div>
+          <div class="brandcol"><h4>Assets by department</h4><div id="tc-assets"><div class="hl-loading">Loading</div></div></div>
+        </div>
+        <div class="vregions" id="team-split" style="margin-top:22px;"></div>
+      </div>
+    </div>
+
+    <!-- By asset type -->
+    <div class="band band-grey">
+      <div class="wrap">
+        <div class="section-head acc-orange">
+          <h2>By asset type</h2>
+          <span class="meta">Static, motion and beyond — assets and hours split by type. Multi-type briefs split evenly.</span>
+        </div>
+        <div class="grid grid-2" id="atype-cols">
+          <div class="brandcol"><h4>Assets by type</h4><div id="at-assets"><div class="hl-loading">Loading</div></div></div>
+          <div class="brandcol"><h4>Hours by type</h4><div id="at-hours"><div class="hl-loading">Loading</div></div></div>
+        </div>
+        <div class="vregions" id="at-split" style="margin-top:22px;"></div>
+      </div>
+    </div>
+
   </main>
 
   <footer>
@@ -87,60 +167,384 @@
     const count = (arr, keysFn) => { const m = {}; arr.forEach(j => keysFn(j).forEach(k => { if (k) m[k] = (m[k] || 0) + 1; })); return m; };
     const sortedEntries = m => Object.entries(m).sort((a, b) => b[1] - a[1]);
 
+    // ---- Headlines / auto-generated insights ----
+    const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+    const primaryCode = j => brandCodes(j)[0] || '';
+    const PENT = '<svg class="pent" viewBox="0 0 100 100"><path d="M50 12 L86 39 L72 82 L28 82 L14 39 Z"/></svg>';
+    const ICO = {
+      pie: '<path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>',
+      zap: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+      target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+      trophy: '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.7V17c0 .5-.5 1-1 1.2C7.9 18.8 7 20.2 7 22"/><path d="M14 14.7V17c0 .5.5 1 1 1.2C16.1 18.8 17 20.2 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>'
+    };
+    const insightCard = (colour, icon, html) =>
+      `<div class="card insight"><span class="ipent ${colour}">${PENT}<svg class="ico" viewBox="0 0 24 24">${ICO[icon]}</svg></span>` +
+      `<div class="ins-eyebrow">Insight</div><div class="ins-text">${html}</div></div>`;
+
+    const monYr = iso => { const p = iso.slice(0, 7).split('-'); return MSHORT[+p[1] - 1] + ' ' + p[0]; };
+
+    function renderHeadlines(delivered, meta) {
+      const el = document.getElementById('headlines');
+      const metaEl = document.getElementById('hl-meta');
+      if (!delivered.length) { metaEl.textContent = ''; el.innerHTML = '<div class="hl-loading" style="grid-column:1/-1;">No delivered jobs to analyse yet.</div>'; return; }
+
+      const dates = delivered.map(j => j.deliveredISO).filter(Boolean).sort();
+      if (dates.length) {
+        const a = monYr(dates[0]), b = monYr(dates[dates.length - 1]);
+        metaEl.textContent = 'Auto-generated from ' + delivered.length + ' briefs · ' + (a === b ? a : a + ' – ' + b);
+      } else { metaEl.textContent = 'Auto-generated from ' + delivered.length + ' briefs'; }
+
+      const totalHours = delivered.reduce((s, j) => s + num(j.hours), 0);
+      const pct = h => totalHours ? Math.round(h / totalHours * 100) : 0;
+      const cards = [];
+
+      // 1) Busiest vertical by hours
+      const vH = {}, vBrands = {};
+      delivered.forEach(j => { const c = primaryCode(j), v = (meta[c] || {}).vertical; if (!v) return; vH[v] = (vH[v] || 0) + num(j.hours); (vBrands[v] = vBrands[v] || new Set()).add(c); });
+      const topV = sortedEntries(vH)[0];
+      if (topV) {
+        const n = vBrands[topV[0]].size;
+        cards.push(insightCard('blue', 'pie',
+          `<b>${topV[0]} is the busiest vertical</b> — ${pct(topV[1])}% of all hours (${topV[1].toFixed(1)}h across ${n} brand${n > 1 ? 's' : ''}).`));
+      }
+
+      // 2) Top brand by assets
+      const bA = {}, bH = {};
+      delivered.forEach(j => { const c = primaryCode(j); if (!c) return; bA[c] = (bA[c] || 0) + num(j.assets); bH[c] = (bH[c] || 0) + num(j.hours); });
+      const topB = sortedEntries(bA)[0];
+      if (topB) {
+        const m = meta[topB[0]] || {};
+        cards.push(insightCard('rose', 'zap',
+          `<b>${(m.flag ? m.flag + ' ' : '') + topB[0]} leads on assets</b> — ${Math.round(topB[1])} deliverables (${bH[topB[0]].toFixed(1)}h).`));
+      }
+
+      // 3) Heaviest single brief by hours
+      const heavy = delivered.reduce((a, j) => (!a || num(j.hours) > num(a.hours)) ? j : a, null);
+      if (heavy && num(heavy.hours) > 0) {
+        cards.push(insightCard('blue', 'target',
+          `<b>${heavy.jobNumber || 'One brief'} is the heaviest brief</b> — ${num(heavy.hours).toFixed(1)}h (${pct(num(heavy.hours))}% of the total)${primaryCode(heavy) ? ' for ' + primaryCode(heavy) : ''}.`));
+      }
+
+      // 4) Most active stakeholder by brief count
+      const sC = {}, sH = {};
+      delivered.forEach(j => { const s = (j.stakeholder || '').trim(); if (!s) return; sC[s] = (sC[s] || 0) + 1; sH[s] = (sH[s] || 0) + num(j.hours); });
+      const topS = sortedEntries(sC)[0];
+      if (topS) {
+        cards.push(insightCard('rose', 'trophy',
+          `<b>${topS[0]} submitted the most briefs</b> — ${topS[1]} in total, ${sH[topS[0]].toFixed(1)}h of work.`));
+      }
+
+      el.innerHTML = cards.join('');
+    }
+
+    // ---- Per-brand activity ----
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const brandLabel = (code, meta) => (meta[code] && meta[code].flag ? meta[code].flag + ' ' : '') + esc(code);
+
+    function brandColumn(mountId, entries, meta, fmt) {
+      const max = entries.length ? entries[0][1] : 0;
+      document.getElementById(mountId).innerHTML = entries.map(([code, val]) => {
+        const colour = (meta[code] && meta[code].colour) || GREY;
+        const w = max ? Math.max(2, Math.round(val / max * 100)) : 0;
+        return `<div class="brow"><div class="brow-top"><span class="brow-label">${brandLabel(code, meta)}</span><span class="brow-val">${fmt(val)}</span></div>` +
+          `<div class="btrack"><span class="bfill" style="width:${w}%;background:${colour}"></span></div></div>`;
+      }).join('') || '<div class="brow-empty">No data.</div>';
+    }
+
+    function calloutCard(label, code, metricHtml, meta) {
+      const colour = (meta[code] && meta[code].colour) || 'var(--quantum-blue)';
+      return `<div class="callout" style="border-left-color:${colour}"><div class="co-label">${label}</div>` +
+        `<div class="co-brand">${brandLabel(code, meta)}</div><div class="co-metric">${metricHtml}</div></div>`;
+    }
+
+    function renderBrandActivity(delivered, meta) {
+      const cardsEl = document.getElementById('brand-callouts');
+      const briefs = {}, assets = {}, hours = {};
+      delivered.forEach(j => {
+        const codes = [...new Set(brandCodes(j))];
+        if (!codes.length) return;
+        const n = codes.length, a = num(j.assets), h = num(j.hours);
+        codes.forEach(c => { briefs[c] = (briefs[c] || 0) + 1; assets[c] = (assets[c] || 0) + a / n; hours[c] = (hours[c] || 0) + h / n; });
+      });
+      const briefE = sortedEntries(briefs), assetE = sortedEntries(assets), hourE = sortedEntries(hours);
+
+      if (!briefE.length) {
+        cardsEl.innerHTML = '<div class="hl-loading" style="grid-column:1/-1;">No brand data yet.</div>';
+        return;
+      }
+      cardsEl.innerHTML =
+        calloutCard('Most requested', briefE[0][0], Math.round(briefE[0][1]) + ' briefs', meta) +
+        calloutCard('Most assets', assetE[0][0], Math.round(assetE[0][1]) + ' assets', meta) +
+        calloutCard('Most hours', hourE[0][0], hourE[0][1].toFixed(1) + ' hrs', meta);
+
+      brandColumn('col-briefs', briefE, meta, v => Math.round(v));
+      brandColumn('col-assets', assetE, meta, v => Math.round(v).toLocaleString());
+      brandColumn('col-hours', hourE, meta, v => v.toFixed(2) + 'h');
+    }
+
+    // ---- Who's submitting the work (by stakeholder) ----
+    function peopleColumn(mountId, entries, fmt) {
+      const max = entries.length ? entries[0][1] : 0;
+      document.getElementById(mountId).innerHTML = entries.map(([name, val], i) => {
+        const rank = i + 1, tone = rank % 2 ? 'blue' : 'rose', solid = rank <= 3 ? ' solid' : '';
+        const colour = rank % 2 ? BLUE : ROSE;
+        const w = max ? Math.max(2, Math.round(val / max * 100)) : 0;
+        return `<div class="brow"><div class="brow-top"><span class="srank ${tone}${solid}">${rank}</span>` +
+          `<span class="brow-label">${esc(name)}</span>` +
+          `<span class="brow-val">${fmt(val)}</span></div>` +
+          `<div class="btrack"><span class="bfill" style="width:${w}%;background:${colour}"></span></div></div>`;
+      }).join('') || '<div class="brow-empty">No data.</div>';
+    }
+
+    function peopleCallout(label, name, metricHtml) {
+      return `<div class="callout"><div class="co-label">${label}</div>` +
+        `<div class="co-brand">${esc(name)}</div>` +
+        `<div class="co-metric">${metricHtml}</div></div>`;
+    }
+
+    function renderPeople(delivered) {
+      const cardsEl = document.getElementById('people-callouts');
+      const briefs = {}, assets = {}, hours = {};
+      delivered.forEach(j => { const s = (j.stakeholder || '').trim(); if (!s) return; briefs[s] = (briefs[s] || 0) + 1; assets[s] = (assets[s] || 0) + num(j.assets); hours[s] = (hours[s] || 0) + num(j.hours); });
+      const bE = sortedEntries(briefs), aE = sortedEntries(assets), hE = sortedEntries(hours);
+
+      if (!bE.length) { cardsEl.innerHTML = '<div class="hl-loading" style="grid-column:1/-1;">No stakeholder data yet.</div>'; return; }
+      cardsEl.innerHTML =
+        peopleCallout('Most briefs', bE[0][0], Math.round(bE[0][1]) + ' briefs') +
+        peopleCallout('Most assets', aE[0][0], Math.round(aE[0][1]).toLocaleString() + ' assets') +
+        peopleCallout('Most hours', hE[0][0], hE[0][1].toFixed(1) + ' hrs');
+
+      peopleColumn('pc-briefs', bE, v => Math.round(v));
+      peopleColumn('pc-assets', aE, v => Math.round(v).toLocaleString());
+      peopleColumn('pc-hours', hE, v => v.toFixed(2) + 'h');
+    }
+
+    // ---- By business area (verticals, by hours, even-split) ----
+    const textOn = hex => { const c = String(hex || '').replace('#', ''); if (c.length < 6) return '#fff'; const r = parseInt(c.substr(0, 2), 16), g = parseInt(c.substr(2, 2), 16), b = parseInt(c.substr(4, 2), 16); return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.62 ? '#0a0e12' : '#ffffff'; };
+    const REGION_LABEL = { GB: 'UK', US: 'US', IE: 'Ireland', ZA: 'South Africa', INT: 'Internal' };
+    const REGION_COLOUR = { GB: '#0086ff', US: '#f42ca4', INT: '#ff7900', IE: '#2ae864', ZA: '#c515ff' };
+
+    // 100% stacked breakdown bar + legend
+    function stackBar(entries, colourFor, labelFor, fmt) {
+      const total = entries.reduce((s, e) => s + e[1], 0);
+      const segs = entries.map(([k, v]) => {
+        const pct = total ? v / total * 100 : 0, colour = colourFor(k);
+        const lbl = pct >= 8 ? `<span class="vseg-lbl" style="color:${textOn(colour)}">${Math.round(pct)}%</span>` : '';
+        return `<span class="vseg" style="width:${pct}%;background:${colour}" title="${esc(labelFor(k))} ${Math.round(pct)}%">${lbl}</span>`;
+      }).join('');
+      const legend = entries.map(([k, v]) => {
+        const pct = total ? Math.round(v / total * 100) : 0, colour = colourFor(k);
+        return `<span class="vlg"><span class="dot" style="background:${colour}"></span><b>${esc(labelFor(k))}</b> ${fmt(v)} · ${pct}%</span>`;
+      }).join('');
+      return `<div class="vsplit">${segs}</div><div class="vsplit-legend">${legend}</div>`;
+    }
+
+    function renderBusinessArea(delivered, meta) {
+      const el = document.getElementById('varea'), regEl = document.getElementById('vregions');
+      const vHours = {}, vCodes = {}, rHours = {};
+      let total = 0;
+      delivered.forEach(j => {
+        const codes = [...new Set(brandCodes(j))]; if (!codes.length) return;
+        const share = num(j.hours) / codes.length;
+        codes.forEach(c => {
+          total += share;
+          const v = (meta[c] && meta[c].vertical) || 'Unknown';
+          vHours[v] = (vHours[v] || 0) + share;
+          (vCodes[v] = vCodes[v] || new Set()).add(c);
+          const r = meta[c] && meta[c].region; if (r) rHours[r] = (rHours[r] || 0) + share;
+        });
+      });
+      const entries = sortedEntries(vHours);
+      if (!entries.length) { el.innerHTML = '<div class="hl-loading">No data yet.</div>'; regEl.innerHTML = ''; return; }
+
+      el.innerHTML = entries.map(([v, h]) => {
+        const codes = [...vCodes[v]].sort(), first = codes[0];
+        const colour = (meta[first] && meta[first].colour) || '#3d4449';
+        const flag = (meta[first] && meta[first].flag) || '🏢';
+        const pct = total ? h / total * 100 : 0;
+        return `<div class="vrow"><div class="vlabel"><span class="vflag">${flag}</span><div><div class="vname">${esc(v)}</div><div class="vcodes">${esc(codes.join(' · '))}</div></div></div>` +
+          `<div class="vbar"><span class="vbar-fill" style="width:${pct}%;background:${colour};color:${textOn(colour)}">${pct.toFixed(1)}%</span></div>` +
+          `<div class="vhours">${h.toFixed(1)}h</div></div>`;
+      }).join('');
+
+      const rEntries = Object.entries(rHours).sort((a, b) => b[1] - a[1]);
+      const rTotal = rEntries.reduce((s, e) => s + e[1], 0);
+      const segs = rEntries.map(([r, h]) => {
+        const pct = rTotal ? h / rTotal * 100 : 0, colour = REGION_COLOUR[r] || GREY;
+        const lbl = pct >= 8 ? `<span class="vseg-lbl" style="color:${textOn(colour)}">${Math.round(pct)}%</span>` : '';
+        return `<span class="vseg" style="width:${pct}%;background:${colour}" title="${esc(REGION_LABEL[r] || r)} ${Math.round(pct)}%">${lbl}</span>`;
+      }).join('');
+      const legend = rEntries.map(([r, h]) => {
+        const pct = rTotal ? Math.round(h / rTotal * 100) : 0, colour = REGION_COLOUR[r] || GREY;
+        return `<span class="vlg"><span class="dot" style="background:${colour}"></span><b>${esc(REGION_LABEL[r] || r)}</b> ${h.toFixed(1)}h · ${pct}%</span>`;
+      }).join('');
+      regEl.innerHTML = `<div class="vsplit">${segs}</div><div class="vsplit-legend">${legend}</div>`;
+    }
+
+    // ---- Where the time goes (by channel, even-split) ----
+    const fmtAssets = v => { const r = Math.round(v * 10) / 10; return Number.isInteger(r) ? String(r) : r.toFixed(1); };
+    const CH_PALETTE = ['#0086ff', '#f42ca4', '#2ae864', '#ffb800', '#c515ff', '#00c19d', '#ff7900', '#143b76', '#47007b', '#de001c'];
+
+    function teamRows(mountId, entries, colourFor, fmt) {
+      const max = entries.length ? entries[0][1] : 0;
+      document.getElementById(mountId).innerHTML = entries.map(([name, val]) => {
+        const w = max ? Math.max(2, Math.round(val / max * 100)) : 0;
+        return `<div class="trow"><span class="tname">${esc(name)}</span>` +
+          `<span class="tbar"><span style="width:${w}%;background:${colourFor(name)}"></span></span>` +
+          `<span class="tval">${fmt(val)}</span></div>`;
+      }).join('') || '<div class="brow-empty">No data.</div>';
+    }
+
+    function renderTimeByTeam(delivered) {
+      const chH = {}, chA = {};
+      delivered.forEach(j => {
+        const chans = [...new Set(cells(j.channel))]; if (!chans.length) return;
+        const n = chans.length, h = num(j.hours) / n, a = num(j.assets) / n;
+        chans.forEach(c => { chH[c] = (chH[c] || 0) + h; chA[c] = (chA[c] || 0) + a; });
+      });
+      const hE = sortedEntries(chH), aE = sortedEntries(chA);
+      const cmap = {};
+      hE.forEach(([name], i) => { cmap[name] = CH_PALETTE[i % CH_PALETTE.length]; });
+      aE.forEach(([name]) => { if (!cmap[name]) cmap[name] = CH_PALETTE[Object.keys(cmap).length % CH_PALETTE.length]; });
+      const colourFor = k => cmap[k] || GREY;
+      teamRows('tc-hours', hE, colourFor, v => v.toFixed(2) + 'h');
+      teamRows('tc-assets', aE, colourFor, v => fmtAssets(v));
+      document.getElementById('team-split').innerHTML = stackBar(hE, colourFor, k => k, v => v.toFixed(1) + 'h');
+    }
+
+    // ---- By asset type (even-split) ----
+    function renderAssetType(delivered) {
+      const tA = {}, tH = {};
+      delivered.forEach(j => {
+        const types = [...new Set(cells(j.assetType))]; if (!types.length) return;
+        const n = types.length, a = num(j.assets) / n, h = num(j.hours) / n;
+        types.forEach(t => { tA[t] = (tA[t] || 0) + a; tH[t] = (tH[t] || 0) + h; });
+      });
+      const aE = sortedEntries(tA), hE = sortedEntries(tH);
+      const cmap = {};
+      aE.forEach(([name], i) => { cmap[name] = CH_PALETTE[i % CH_PALETTE.length]; });
+      hE.forEach(([name]) => { if (!cmap[name]) cmap[name] = CH_PALETTE[Object.keys(cmap).length % CH_PALETTE.length]; });
+      const colourFor = k => cmap[k] || GREY;
+      teamRows('at-assets', aE, colourFor, v => fmtAssets(v));
+      teamRows('at-hours', hE, colourFor, v => v.toFixed(2) + 'h');
+      document.getElementById('at-split').innerHTML = stackBar(aE, colourFor, k => k, v => fmtAssets(v) + ' assets');
+    }
+
+    // ---- Period filter + month-over-month comparison ----
+    let ALLDELIVERED = [], META = {}, MONTHCHART = null, LENSPERIODS = {}, LENS = 'month', LENSIDX = { month: 0, quarter: 0, fy: 0, all: 0 };
+    const LS_KEY = 'qch-data-period';
+    const pad2 = n => String(n).padStart(2, '0');
+    const iso = d => d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+    const ymOf = d => d.getFullYear() + '-' + pad2(d.getMonth() + 1);
+    const inRange = (v, s, e) => (!s || v >= s) && (!e || v < e);
+    const fyEndYear = (y, m) => m >= 10 ? y + 1 : y;
+    const fyQuarter = m => m >= 10 ? 1 : m <= 3 ? 2 : m <= 6 ? 3 : 4;
+    const fyRange = fy => ({ start: iso(new Date(fy - 1, 9, 1)), end: iso(new Date(fy, 9, 1)) });
+    const quarterRange = (q, fy) => { const st = { 1: [fy - 1, 9], 2: [fy, 0], 3: [fy, 3], 4: [fy, 6] }[q]; return { start: iso(new Date(st[0], st[1], 1)), end: iso(new Date(st[0], st[1] + 3, 1)) }; };
+
+    const monthPeriod = (y, mo) => ({ kind: 'month', yy: y, mo, label: MSHORT[mo] + ' ' + y, start: iso(new Date(y, mo, 1)), end: iso(new Date(y, mo + 1, 1)) });
+    const quarterPeriod = (q, fy) => { const r = quarterRange(q, fy); return { kind: 'quarter', q, fy, label: 'Q' + q + ' FY' + pad2(fy % 100), start: r.start, end: r.end }; };
+    const fyPeriod = fy => { const r = fyRange(fy); return { kind: 'fy', fy, label: 'FY' + pad2(fy % 100), start: r.start, end: r.end }; };
+
+    function buildPeriods() {
+      const now = new Date(), endD = new Date(now.getFullYear(), now.getMonth(), 1);
+      let minKey = null;
+      ALLDELIVERED.forEach(j => { const k = j.deliveredISO.slice(0, 7); if (!minKey || k < minKey) minKey = k; });
+      const sY = minKey ? +minKey.slice(0, 4) : now.getFullYear(), sMo = minKey ? +minKey.slice(5, 7) - 1 : now.getMonth();
+      const months = [];
+      let d = new Date(sY, sMo, 1);
+      while (d <= endD) { months.push(monthPeriod(d.getFullYear(), d.getMonth())); d = new Date(d.getFullYear(), d.getMonth() + 1, 1); }
+      const qSeen = new Set(), quarters = [], fySeen = new Set(), fys = [];
+      months.forEach(mp => {
+        const m1 = mp.mo + 1, fy = fyEndYear(mp.yy, m1), q = fyQuarter(m1);
+        if (!qSeen.has(fy + '-' + q)) { qSeen.add(fy + '-' + q); quarters.push(quarterPeriod(q, fy)); }
+        if (!fySeen.has(fy)) { fySeen.add(fy); fys.push(fyPeriod(fy)); }
+      });
+      LENSPERIODS = { month: months, quarter: quarters, fy: fys, all: [{ kind: 'all', label: 'All time', start: null, end: null }] };
+    }
+
+    const defaultIndex = lens => { const arr = LENSPERIODS[lens] || []; return lens === 'month' ? Math.max(0, arr.length - 2) : Math.max(0, arr.length - 1); };
+
+    function wireControls() {
+      document.querySelectorAll('#period-lens button').forEach(b => b.addEventListener('click', () => { LENS = b.dataset.lens; applyPeriod(); }));
+      document.getElementById('pstep-prev').addEventListener('click', () => { if (LENS !== 'all') { LENSIDX[LENS]--; applyPeriod(); } });
+      document.getElementById('pstep-next').addEventListener('click', () => { if (LENS !== 'all') { LENSIDX[LENS]++; applyPeriod(); } });
+    }
+
+    function applyPeriod() {
+      const arr = LENSPERIODS[LENS] || [];
+      const i = Math.max(0, Math.min(LENSIDX[LENS] || 0, arr.length - 1)); LENSIDX[LENS] = i;
+      const p = arr[i] || { kind: 'all', label: 'All time', start: null, end: null };
+      document.querySelectorAll('#period-lens button').forEach(b => b.classList.toggle('active', b.dataset.lens === LENS));
+      const step = document.getElementById('period-step');
+      if (LENS === 'all') { step.style.display = 'none'; }
+      else {
+        step.style.display = '';
+        document.getElementById('pstep-label').textContent = p.label;
+        document.getElementById('pstep-prev').disabled = i <= 0;
+        document.getElementById('pstep-next').disabled = i >= arr.length - 1;
+      }
+      const filtered = ALLDELIVERED.filter(j => inRange(j.deliveredISO, p.start, p.end));
+      document.getElementById('period-count').textContent = filtered.length + (filtered.length === 1 ? ' brief' : ' briefs') + ' in period';
+      renderAll(filtered);
+      renderComparison(p);
+      try { localStorage.setItem(LS_KEY, JSON.stringify({ lens: LENS, idx: LENSIDX })); } catch (e) {}
+    }
+
+    function renderAll(delivered) {
+      renderHeadlines(delivered, META);
+      renderBrandActivity(delivered, META);
+      renderPeople(delivered);
+      renderBusinessArea(delivered, META);
+      renderTimeByTeam(delivered);
+      renderAssetType(delivered);
+    }
+
+    const rangeTotals = (s, e) => { let b = 0, h = 0, a = 0; ALLDELIVERED.forEach(j => { if (inRange(j.deliveredISO, s, e)) { b++; h += num(j.hours); a += num(j.assets); } }); return { b, h, a }; };
+    function previousPeriod(p) {
+      if (p.kind === 'month') { const d = new Date(p.yy, p.mo - 1, 1); return { label: MSHORT[d.getMonth()] + ' ' + d.getFullYear(), start: iso(new Date(d.getFullYear(), d.getMonth(), 1)), end: iso(new Date(d.getFullYear(), d.getMonth() + 1, 1)) }; }
+      if (p.kind === 'quarter') { const pq = p.q === 1 ? 4 : p.q - 1, pf = p.q === 1 ? p.fy - 1 : p.fy, r = quarterRange(pq, pf); return { label: 'Q' + pq + ' FY' + pad2(pf % 100), start: r.start, end: r.end }; }
+      if (p.kind === 'fy') { const pf = p.fy - 1, r = fyRange(pf); return { label: 'FY' + pad2(pf % 100), start: r.start, end: r.end }; }
+      return null;
+    }
+
+    function renderComparison(p) {
+      const box = document.getElementById('cmp-box');
+      const prev = previousPeriod(p);
+      if (!prev) { box.innerHTML = '<div class="cmp-title">All time — no prior period to compare</div>'; return; }
+      const cur = rangeTotals(p.start, p.end), pv = rangeTotals(prev.start, prev.end);
+      const rows = [['Briefs', cur.b, pv.b, v => v], ['Hours', cur.h, pv.h, v => Math.round(v) + 'h'], ['Assets', cur.a, pv.a, v => Math.round(v)]];
+      box.innerHTML = `<div class="cmp-title">${p.label} vs ${prev.label}</div>` + rows.map(([label, c, pvv, fmt]) => {
+        const d = pvv ? Math.round((c - pvv) / pvv * 100) : (c ? 100 : 0);
+        const dir = c > pvv ? 'up' : c < pvv ? 'down' : 'flat', arrow = dir === 'up' ? '▲' : dir === 'down' ? '▼' : '–', sign = d > 0 ? '+' : '';
+        return `<div class="cmp-row"><span class="cmp-label">${label}</span><span class="cmp-delta ${dir}">${arrow} ${sign}${d}%</span><span class="cmp-vals">${fmt(pvv)} → ${fmt(c)}</span></div>`;
+      }).join('');
+    }
+
     async function load() {
       let data;
       try { const r = await fetch(DATA_URL, { cache: 'no-store' }); data = await r.json(); }
       catch (e) {
-        document.getElementById('data-meta').textContent = 'Could not load the data feed.';
+        document.getElementById('period-count').textContent = 'Could not load the data feed.';
         document.querySelectorAll('.chart-loading').forEach(el => { el.classList.add('error'); el.textContent = 'Could not load'; });
+        document.getElementById('cmp-box').innerHTML = '<div class="cmp-title">No data</div>';
+        document.getElementById('hl-meta').textContent = '';
+        ['headlines', 'brand-callouts', 'people-callouts'].forEach(id => document.getElementById(id).innerHTML = '<div class="hl-loading error" style="grid-column:1/-1;">Could not load.</div>');
+        ['varea', 'tc-hours', 'tc-assets', 'team-split', 'at-assets', 'at-hours', 'at-split'].forEach(id => document.getElementById(id).innerHTML = '<div class="hl-loading error">Could not load.</div>');
         return;
       }
-
-      const delivered = (data.delivered || []).filter(j => j.deliveredISO);
-      const meta = data.brandMeta || {};
-      document.getElementById('data-meta').textContent = 'Based on the last ' + delivered.length + ' delivered jobs.';
+      ALLDELIVERED = (data.delivered || []).filter(j => j.deliveredISO);
+      META = data.brandMeta || {};
       document.querySelectorAll('.chart-loading').forEach(el => el.remove());
-
-      if (window.Chart) { Chart.defaults.color = TEXT; Chart.defaults.font.family = 'Proxima Nova'; }
-      const noLegend = { plugins: { legend: { display: false } } };
-
-      const byMonth = {};
-      delivered.forEach(j => { const m = j.deliveredISO.slice(0, 7); byMonth[m] = (byMonth[m] || 0) + 1; });
-      const months = Object.keys(byMonth).sort();
-      new Chart(document.getElementById('c-month'), {
-        type: 'bar',
-        data: { labels: months.map(m => { const p = m.split('-'); return MSHORT[+p[1] - 1] + ' ' + p[0].slice(2); }), datasets: [{ data: months.map(m => byMonth[m]), backgroundColor: BLUE, borderRadius: 6, maxBarThickness: 44 }] },
-        options: { responsive: true, maintainAspectRatio: false, ...noLegend, scales: { x: { grid: { display: false }, border: { color: GRID } }, y: { grid: { color: GRID }, border: { display: false }, beginAtZero: true } } }
-      });
-
-      const brandE = sortedEntries(count(delivered, brandCodes));
-      new Chart(document.getElementById('c-brand'), {
-        type: 'bar',
-        data: { labels: brandE.map(e => e[0]), datasets: [{ data: brandE.map(e => e[1]), backgroundColor: brandE.map(e => (meta[e[0]] && meta[e[0]].colour) || GREY), borderRadius: 5 }] },
-        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, ...noLegend, scales: { x: { grid: { color: GRID }, border: { display: false }, beginAtZero: true }, y: { grid: { display: false }, border: { color: GRID } } } }
-      });
-
-      const vertE = sortedEntries(count(delivered, j => brandCodes(j).map(c => meta[c] && meta[c].vertical).filter(Boolean)));
-      new Chart(document.getElementById('c-vert'), {
-        type: 'doughnut',
-        data: { labels: vertE.map(e => e[0]), datasets: [{ data: vertE.map(e => e[1]), backgroundColor: vertE.map((e, i) => PALETTE[i % PALETTE.length]), borderColor: '#fff', borderWidth: 3 }] },
-        options: { responsive: true, maintainAspectRatio: false, cutout: '58%', plugins: { legend: { position: 'right', labels: { padding: 12, boxWidth: 12, usePointStyle: true } } } }
-      });
-
-      const teamE = sortedEntries(count(delivered, j => cells(j.channel)));
-      new Chart(document.getElementById('c-team'), {
-        type: 'bar',
-        data: { labels: teamE.map(e => e[0]), datasets: [{ data: teamE.map(e => e[1]), backgroundColor: BLUE, borderRadius: 5 }] },
-        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, ...noLegend, scales: { x: { grid: { color: GRID }, border: { display: false }, beginAtZero: true }, y: { grid: { display: false }, border: { color: GRID } } } }
-      });
-
-      const sm = { Static: 0, Motion: 0 };
-      delivered.forEach(j => { const at = String(j.assetType || '').toLowerCase(); if (at === 'static') sm.Static++; else if (at === 'motion') sm.Motion++; });
-      new Chart(document.getElementById('c-sm'), {
-        type: 'doughnut',
-        data: { labels: ['Static', 'Motion'], datasets: [{ data: [sm.Static, sm.Motion], backgroundColor: [BLUE, ROSE], borderColor: '#fff', borderWidth: 3 }] },
-        options: { responsive: true, maintainAspectRatio: false, cutout: '58%', plugins: { legend: { position: 'right', labels: { padding: 12, boxWidth: 12, usePointStyle: true } } } }
-      });
+      buildPeriods();
+      ['month', 'quarter', 'fy', 'all'].forEach(l => { LENSIDX[l] = defaultIndex(l); });
+      let saved = null; try { saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch (e) {}
+      if (saved && saved.lens && LENSPERIODS[saved.lens] && LENSPERIODS[saved.lens].length) {
+        LENS = saved.lens;
+        if (saved.idx) ['month', 'quarter', 'fy', 'all'].forEach(l => { if (LENSPERIODS[l] && typeof saved.idx[l] === 'number' && saved.idx[l] < LENSPERIODS[l].length) LENSIDX[l] = saved.idx[l]; });
+      }
+      wireControls();
+      applyPeriod();
     }
     load();
   </script>

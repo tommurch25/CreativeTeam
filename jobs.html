@@ -25,13 +25,21 @@
     </div>
   </nav>
 
-  <main class="wrap">
+  <main class="banded">
+    <div class="band band-grey"><div class="wrap">
     <section class="hero compact">
       <div class="eyebrow"><span class="dot"></span> Jobs</div>
       <h1>What we're making, and what we've shipped.</h1>
       <p class="lead">Everything in flight and everything recently delivered, in one view. These update automatically as jobs move through the studio.</p>
+      <div class="hero-stats">
+        <div class="hstat"><div class="hstat-num" id="hs-progress">—</div><div class="hstat-label">In progress</div></div>
+        <div class="hstat"><div class="hstat-num" id="hs-pending">—</div><div class="hstat-label">Pending</div></div>
+        <div class="hstat"><div class="hstat-num" id="hs-week">—</div><div class="hstat-label">Delivered this week</div></div>
+      </div>
     </section>
+    </div></div>
 
+    <div class="band band-white"><div class="wrap">
     <!-- In progress -->
     <div class="section-head">
       <h2>In progress</h2>
@@ -47,6 +55,9 @@
       </table>
     </div>
 
+    </div></div>
+
+    <div class="band band-grey"><div class="wrap">
     <!-- Delivered -->
     <div class="section-head acc-green">
       <h2>Delivered</h2>
@@ -80,6 +91,7 @@
       </table>
     </div>
     <p style="margin-top:12px;color:var(--muted);font-size:0.82rem;">Scroll within a table to see all rows · search and filters are live · click a column to sort · hover a Multi-brand chip for the full list.</p>
+    </div></div>
   </main>
 
   <footer>
@@ -97,6 +109,7 @@
     const DROPDOWNS = [];
     let ipSort = { key: 'due', dir: 'asc' };
     let dvSort = { key: 'date', dir: 'desc' };
+    const DV_MAX = 250;   // cap Delivered rows rendered to the DOM (filters/sort still run over everything)
 
     // ----- helpers -----
     const codeOf = s => { const i = s.indexOf(' - '); return (i > -1 ? s.slice(0, i) : s).trim(); };
@@ -140,7 +153,7 @@
       { key: 'link', label: 'Link', sortable: false, cell: j => viewBtn(j.deliveryUrl) }
     ];
 
-    function renderTable(headId, bodyId, cols, rows, state, onSort) {
+    function renderTable(headId, bodyId, cols, rows, state, onSort, limit) {
       document.getElementById(headId).innerHTML = '<tr>' + cols.map(c => {
         if (!c.sortable) return `<th class="${c.num ? 'num' : ''}">${c.label}</th>`;
         const active = state.key === c.key;
@@ -153,6 +166,7 @@
         const col = cols.find(c => c.key === state.key), dir = state.dir === 'asc' ? 1 : -1;
         r.sort((a, b) => { const x = col.sort(a), y = col.sort(b); return (typeof x === 'string' && typeof y === 'string') ? x.localeCompare(y) * dir : (x < y ? -1 : x > y ? 1 : 0) * dir; });
       }
+      if (limit && r.length > limit) r = r.slice(0, limit);
       document.getElementById(bodyId).innerHTML = r.length
         ? r.map(j => '<tr>' + cols.map(c => `<td class="nowrap ${c.num ? 'num' : ''}"${c.title ? ' title="' + esc(c.title(j)) + '"' : ''}>${c.cell(j)}</td>`).join('') + '</tr>').join('')
         : `<tr><td class="empty" colspan="${cols.length}">Nothing to show.</td></tr>`;
@@ -163,6 +177,19 @@
         else { state.key = k; const col = cols.find(c => c.key === k); state.dir = (col.num || k === 'date' || k === 'due') ? 'desc' : 'asc'; }
         onSort();
       }));
+    }
+
+    // ----- Hero stats -----
+    function updateHeroStats() {
+      const pending = INPROGRESS.filter(j => j.status === 'Pending').length;
+      const live = INPROGRESS.length - pending;
+      const now = new Date();
+      const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((now.getDay() + 6) % 7));
+      const mk = monday.getFullYear() + '-' + String(monday.getMonth() + 1).padStart(2, '0') + '-' + String(monday.getDate()).padStart(2, '0');
+      const week = DELIVERED.filter(j => j.deliveredISO && j.deliveredISO >= mk).length;
+      document.getElementById('hs-progress').textContent = live;
+      document.getElementById('hs-pending').textContent = pending;
+      document.getElementById('hs-week').textContent = week;
     }
 
     // ----- In progress -----
@@ -219,7 +246,7 @@
       if (F.date) pills.push({ key: 'date', v: F.date, label: DATE_LABEL[F.date] || F.date });
       let html = pills.map(p => `<button class="pill" data-key="${p.key}" data-v="${encodeURIComponent(p.v)}">${p.label || p.v}<span class="x">×</span></button>`).join('');
       if (pills.length) html += '<button class="clear-all" id="clear-all">Clear all</button>';
-      html += `<span class="result-count">${shown} of ${total}</span>`;
+      html += `<span class="result-count">${shown > DV_MAX ? 'showing ' + DV_MAX + ' of ' + shown + ' matches' : shown + ' of ' + total}</span>`;
       wrap.innerHTML = html;
       wrap.querySelectorAll('.pill').forEach(el => el.addEventListener('click', () => {
         const key = el.dataset.key, v = decodeURIComponent(el.dataset.v);
@@ -230,7 +257,7 @@
     }
     function renderDelivered() {
       const rows = DELIVERED.filter(passes);
-      renderTable('dv-head', 'delivered-body', DV_COLS, rows, dvSort, renderDelivered);
+      renderTable('dv-head', 'delivered-body', DV_COLS, rows, dvSort, renderDelivered, DV_MAX);
       renderActive(rows.length, DELIVERED.length);
     }
 
@@ -268,6 +295,7 @@
       DELIVERED = data.delivered || [];
       META = data.brandMeta || {};
       document.getElementById('count-delivered').textContent = 'Last ' + DELIVERED.length + ' delivered';
+      updateHeroStats();
 
       renderInProgress();
       makeDropdown('ms-brand', 'Brand', 'brand');
