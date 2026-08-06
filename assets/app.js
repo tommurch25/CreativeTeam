@@ -21,3 +21,22 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
+
+/* Shared: mobile burger nav. */
+(function () {
+  function init() {
+    var burger = document.getElementById('nav-burger'), links = document.getElementById('nav-links');
+    if (!burger || !links) return;
+    function setOpen(o) {
+      links.classList.toggle('open', o);
+      burger.classList.toggle('open', o);
+      burger.setAttribute('aria-expanded', o ? 'true' : 'false');
+    }
+    burger.addEventListener('click', function (e) { e.stopPropagation(); setOpen(!links.classList.contains('open')); });
+    links.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function () { setOpen(false); }); });
+    document.addEventListener('click', function (e) { if (!links.contains(e.target) && e.target !== burger) setOpen(false); });
+    window.addEventListener('resize', function () { if (window.innerWidth > 760) setOpen(false); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();

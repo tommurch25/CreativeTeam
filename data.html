@@ -16,12 +16,13 @@
         <span style="color:var(--chrome-dark-40);">|</span>
         <span style="font-weight:600;color:var(--muted);font-size:0.95rem;">Creative Hub</span>
       </a>
-      <div class="nav-links">
+      <div class="nav-links" id="nav-links">
         <a href="index.html">Home</a>
         <a href="jobs.html">Jobs</a>
         <a href="data.html" class="active">Data</a>
         <a class="nav-cta" href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
       </div>
+      <button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
   </nav>
 
@@ -58,6 +59,13 @@
     <!-- Headlines / auto-generated insights -->
     <div class="band band-white">
       <div class="wrap">
+        <div class="kpi-strip" id="kpis">
+          <div class="kpi"><div class="kpi-value" id="k-briefs">—</div><div class="kpi-label">Briefs delivered</div></div>
+          <div class="kpi"><div class="kpi-value" id="k-assets">—</div><div class="kpi-label">Assets delivered</div></div>
+          <div class="kpi"><div class="kpi-value" id="k-hours">—</div><div class="kpi-label">Hours logged</div></div>
+          <div class="kpi"><div class="kpi-value" id="k-avg">—</div><div class="kpi-label">Avg hours / brief</div></div>
+          <div class="kpi"><div class="kpi-value" id="k-brands">—</div><div class="kpi-label">Active brands</div></div>
+        </div>
         <div class="section-head acc-rose">
           <h2>The headlines</h2>
           <span class="meta" id="hl-meta">Reading the tracker…</span>
@@ -491,7 +499,19 @@
       try { localStorage.setItem(LS_KEY, JSON.stringify({ lens: LENS, idx: LENSIDX })); } catch (e) {}
     }
 
+    function renderKpis(delivered) {
+      const briefs = delivered.length;
+      let assets = 0, hours = 0; const bset = new Set();
+      delivered.forEach(j => { assets += num(j.assets); hours += num(j.hours); [...new Set(brandCodes(j))].forEach(c => bset.add(c)); });
+      document.getElementById('k-briefs').textContent = briefs.toLocaleString();
+      document.getElementById('k-assets').textContent = Math.round(assets).toLocaleString();
+      document.getElementById('k-hours').textContent = Math.round(hours).toLocaleString() + 'h';
+      document.getElementById('k-avg').textContent = (briefs ? hours / briefs : 0).toFixed(1) + 'h';
+      document.getElementById('k-brands').textContent = bset.size;
+    }
+
     function renderAll(delivered) {
+      renderKpis(delivered);
       renderHeadlines(delivered, META);
       renderBrandActivity(delivered, META);
       renderPeople(delivered);
