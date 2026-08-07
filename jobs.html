@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Jobs — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css" />
-  <script src="assets/app.js" defer></script>
+  <link rel="stylesheet" href="assets/styles.css?v=6" />
+  <script src="assets/app.js?v=6" defer></script>
 </head>
 <body>
   <nav class="nav">
@@ -20,6 +20,7 @@
         <a href="index.html">Home</a>
         <a href="jobs.html" class="active">Jobs</a>
         <a href="data.html">Data</a>
+        <a href="resources.html">Resources</a>
         <a class="nav-cta" href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
       </div>
       <button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
@@ -87,7 +88,7 @@
 
     <div class="table-card scroll">
       <table class="jt">
-        <colgroup><col style="width:9%"><col style="width:12%"><col style="width:20%"><col style="width:18%"><col style="width:8%"><col style="width:8%"><col style="width:13%"><col style="width:12%"></colgroup>
+        <colgroup><col style="width:26%"><col style="width:9%"><col style="width:13%"><col style="width:16%"><col style="width:8%"><col style="width:8%"><col style="width:11%"><col style="width:9%"></colgroup>
         <thead id="dv-head"></thead><tbody id="delivered-body"></tbody>
       </table>
     </div>
@@ -98,7 +99,7 @@
   <footer>
     <div class="wrap footer-inner">
       <span>Quantum Creative Hub</span>
-      <span>Internal use only · V1.01</span>
+      <span>Internal use only · V1.02</span>
     </div>
   </footer>
 
@@ -144,9 +145,9 @@
       { key: 'status', label: 'Status', sortable: true, sort: j => j.status || '', cell: statusBadge }
     ];
     const DV_COLS = [
+      { key: 'title', label: 'Title', sortable: true, sort: j => (j.title || '').toLowerCase(), cell: j => esc(j.title || '—'), title: j => j.title },
       { key: 'job', label: 'Job', sortable: true, sort: j => numJN(j.jobNumber), cell: jnLink },
       { key: 'brand', label: 'Brand(s)', sortable: true, sort: j => (brandVals(j)[0] || ''), cell: brandCell },
-      { key: 'channel', label: 'Channel', sortable: true, sort: j => (j.channel || '').toLowerCase(), cell: j => esc(j.channel || '—'), title: j => j.channel },
       { key: 'stakeholder', label: 'Stakeholder', sortable: true, sort: j => (j.stakeholder || '').toLowerCase(), cell: j => esc(j.stakeholder || '—'), title: j => j.stakeholder },
       { key: 'assets', label: 'Assets', sortable: true, num: true, sort: j => j.assets == null ? -1 : +j.assets, cell: j => (j.assets == null ? '—' : j.assets) },
       { key: 'hours', label: 'Hours', sortable: true, num: true, sort: j => j.hours == null ? -1 : +j.hours, cell: j => (j.hours == null ? '—' : (+j.hours).toFixed(2)) },
@@ -188,9 +189,10 @@
       const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((now.getDay() + 6) % 7));
       const mk = monday.getFullYear() + '-' + String(monday.getMonth() + 1).padStart(2, '0') + '-' + String(monday.getDate()).padStart(2, '0');
       const week = DELIVERED.filter(j => j.deliveredISO && j.deliveredISO >= mk).length;
-      document.getElementById('hs-progress').textContent = live;
-      document.getElementById('hs-pending').textContent = pending;
-      document.getElementById('hs-week').textContent = week;
+      const num2 = (el, to) => { if (window.animateNumber) window.animateNumber(el, to); else el.textContent = to; };
+      num2(document.getElementById('hs-progress'), live);
+      num2(document.getElementById('hs-pending'), pending);
+      num2(document.getElementById('hs-week'), week);
     }
 
     // ----- In progress -----
@@ -232,7 +234,7 @@
     function passes(j) {
       for (const key of ['brand', 'channel', 'type']) { if (F[key].size && !VAL[key](j).some(v => F[key].has(v))) return false; }
       if (F.date) { const cutoff = Date.now() - Number(F.date) * 86400000; const t = j.deliveredISO ? new Date(j.deliveredISO).getTime() : NaN; if (isNaN(t) || t < cutoff) return false; }
-      if (F.q) { const hay = [j.jobNumber, VAL.brand(j).join(' '), j.brand, j.channel, j.assetType, j.stakeholder].join(' ').toLowerCase(); if (!hay.includes(F.q)) return false; }
+      if (F.q) { const hay = [j.jobNumber, j.title, VAL.brand(j).join(' '), j.brand, j.channel, j.assetType, j.stakeholder].join(' ').toLowerCase(); if (!hay.includes(F.q)) return false; }
       return true;
     }
     function clearAll() {

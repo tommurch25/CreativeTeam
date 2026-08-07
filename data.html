@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Data — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css" />
-  <script src="assets/app.js" defer></script>
+  <link rel="stylesheet" href="assets/styles.css?v=6" />
+  <script src="assets/app.js?v=6" defer></script>
 </head>
 <body>
   <nav class="nav">
@@ -20,6 +20,7 @@
         <a href="index.html">Home</a>
         <a href="jobs.html">Jobs</a>
         <a href="data.html" class="active">Data</a>
+        <a href="resources.html">Resources</a>
         <a class="nav-cta" href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
       </div>
       <button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
@@ -159,7 +160,7 @@
   <footer>
     <div class="wrap footer-inner">
       <span>Quantum Creative Hub</span>
-      <span>Internal use only · V1.01</span>
+      <span>Internal use only · V1.02</span>
     </div>
   </footer>
 
@@ -255,7 +256,7 @@
         const colour = (meta[code] && meta[code].colour) || GREY;
         const w = max ? Math.max(2, Math.round(val / max * 100)) : 0;
         return `<div class="brow"><div class="brow-top"><span class="brow-label">${brandLabel(code, meta)}</span><span class="brow-val">${fmt(val)}</span></div>` +
-          `<div class="btrack"><span class="bfill" style="width:${w}%;background:${colour}"></span></div></div>`;
+          `<div class="btrack"><span class="bfill" style="--w:${w}%;background:${colour}"></span></div></div>`;
       }).join('') || '<div class="brow-empty">No data.</div>';
     }
 
@@ -300,7 +301,7 @@
         return `<div class="brow"><div class="brow-top"><span class="srank ${tone}${solid}">${rank}</span>` +
           `<span class="brow-label">${esc(name)}</span>` +
           `<span class="brow-val">${fmt(val)}</span></div>` +
-          `<div class="btrack"><span class="bfill" style="width:${w}%;background:${colour}"></span></div></div>`;
+          `<div class="btrack"><span class="bfill" style="--w:${w}%;background:${colour}"></span></div></div>`;
       }).join('') || '<div class="brow-empty">No data.</div>';
     }
 
@@ -338,7 +339,7 @@
       const segs = entries.map(([k, v]) => {
         const pct = total ? v / total * 100 : 0, colour = colourFor(k);
         const lbl = pct >= 8 ? `<span class="vseg-lbl" style="color:${textOn(colour)}">${Math.round(pct)}%</span>` : '';
-        return `<span class="vseg" style="width:${pct}%;background:${colour}" title="${esc(labelFor(k))} ${Math.round(pct)}%">${lbl}</span>`;
+        return `<span class="vseg" style="--w:${pct}%;background:${colour}" title="${esc(labelFor(k))} ${Math.round(pct)}%">${lbl}</span>`;
       }).join('');
       const legend = entries.map(([k, v]) => {
         const pct = total ? Math.round(v / total * 100) : 0, colour = colourFor(k);
@@ -371,7 +372,7 @@
         const flag = (meta[first] && meta[first].flag) || '🏢';
         const pct = total ? h / total * 100 : 0;
         return `<div class="vrow"><div class="vlabel"><span class="vflag">${flag}</span><div><div class="vname">${esc(v)}</div><div class="vcodes">${esc(codes.join(' · '))}</div></div></div>` +
-          `<div class="vbar"><span class="vbar-fill" style="width:${pct}%;background:${colour};color:${textOn(colour)}">${pct.toFixed(1)}%</span></div>` +
+          `<div class="vbar"><span class="vbar-fill" style="--w:${pct}%;background:${colour};color:${textOn(colour)}">${pct.toFixed(1)}%</span></div>` +
           `<div class="vhours">${h.toFixed(1)}h</div></div>`;
       }).join('');
 
@@ -380,7 +381,7 @@
       const segs = rEntries.map(([r, h]) => {
         const pct = rTotal ? h / rTotal * 100 : 0, colour = REGION_COLOUR[r] || GREY;
         const lbl = pct >= 8 ? `<span class="vseg-lbl" style="color:${textOn(colour)}">${Math.round(pct)}%</span>` : '';
-        return `<span class="vseg" style="width:${pct}%;background:${colour}" title="${esc(REGION_LABEL[r] || r)} ${Math.round(pct)}%">${lbl}</span>`;
+        return `<span class="vseg" style="--w:${pct}%;background:${colour}" title="${esc(REGION_LABEL[r] || r)} ${Math.round(pct)}%">${lbl}</span>`;
       }).join('');
       const legend = rEntries.map(([r, h]) => {
         const pct = rTotal ? Math.round(h / rTotal * 100) : 0, colour = REGION_COLOUR[r] || GREY;
@@ -398,7 +399,7 @@
       document.getElementById(mountId).innerHTML = entries.map(([name, val]) => {
         const w = max ? Math.max(2, Math.round(val / max * 100)) : 0;
         return `<div class="trow"><span class="tname">${esc(name)}</span>` +
-          `<span class="tbar"><span style="width:${w}%;background:${colourFor(name)}"></span></span>` +
+          `<span class="tbar"><span style="--w:${w}%;background:${colourFor(name)}"></span></span>` +
           `<span class="tval">${fmt(val)}</span></div>`;
       }).join('') || '<div class="brow-empty">No data.</div>';
     }
@@ -499,15 +500,16 @@
       try { localStorage.setItem(LS_KEY, JSON.stringify({ lens: LENS, idx: LENSIDX })); } catch (e) {}
     }
 
+    function num2(el, to, fmt) { if (window.animateNumber) window.animateNumber(el, to, fmt); else el.textContent = (fmt || function (v) { return Math.round(v); })(to); }
     function renderKpis(delivered) {
       const briefs = delivered.length;
       let assets = 0, hours = 0; const bset = new Set();
       delivered.forEach(j => { assets += num(j.assets); hours += num(j.hours); [...new Set(brandCodes(j))].forEach(c => bset.add(c)); });
-      document.getElementById('k-briefs').textContent = briefs.toLocaleString();
-      document.getElementById('k-assets').textContent = Math.round(assets).toLocaleString();
-      document.getElementById('k-hours').textContent = Math.round(hours).toLocaleString() + 'h';
-      document.getElementById('k-avg').textContent = (briefs ? hours / briefs : 0).toFixed(1) + 'h';
-      document.getElementById('k-brands').textContent = bset.size;
+      num2(document.getElementById('k-briefs'), briefs, v => Math.round(v).toLocaleString());
+      num2(document.getElementById('k-assets'), assets, v => Math.round(v).toLocaleString());
+      num2(document.getElementById('k-hours'), hours, v => Math.round(v).toLocaleString() + 'h');
+      num2(document.getElementById('k-avg'), briefs ? hours / briefs : 0, v => v.toFixed(1) + 'h');
+      num2(document.getElementById('k-brands'), bset.size, v => String(Math.round(v)));
     }
 
     function renderAll(delivered) {
