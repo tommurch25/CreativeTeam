@@ -88,7 +88,7 @@
 
     <div class="table-card scroll">
       <table class="jt">
-        <colgroup><col style="width:26%"><col style="width:9%"><col style="width:13%"><col style="width:16%"><col style="width:8%"><col style="width:8%"><col style="width:11%"><col style="width:9%"></colgroup>
+        <colgroup><col style="width:9%"><col style="width:12%"><col style="width:20%"><col style="width:18%"><col style="width:8%"><col style="width:8%"><col style="width:13%"><col style="width:12%"></colgroup>
         <thead id="dv-head"></thead><tbody id="delivered-body"></tbody>
       </table>
     </div>
@@ -145,9 +145,9 @@
       { key: 'status', label: 'Status', sortable: true, sort: j => j.status || '', cell: statusBadge }
     ];
     const DV_COLS = [
-      { key: 'title', label: 'Title', sortable: true, sort: j => (j.title || '').toLowerCase(), cell: j => esc(j.title || '—'), title: j => j.title },
       { key: 'job', label: 'Job', sortable: true, sort: j => numJN(j.jobNumber), cell: jnLink },
       { key: 'brand', label: 'Brand(s)', sortable: true, sort: j => (brandVals(j)[0] || ''), cell: brandCell },
+      { key: 'channel', label: 'Channel', sortable: true, sort: j => (j.channel || '').toLowerCase(), cell: j => esc(j.channel || '—'), title: j => j.channel },
       { key: 'stakeholder', label: 'Stakeholder', sortable: true, sort: j => (j.stakeholder || '').toLowerCase(), cell: j => esc(j.stakeholder || '—'), title: j => j.stakeholder },
       { key: 'assets', label: 'Assets', sortable: true, num: true, sort: j => j.assets == null ? -1 : +j.assets, cell: j => (j.assets == null ? '—' : j.assets) },
       { key: 'hours', label: 'Hours', sortable: true, num: true, sort: j => j.hours == null ? -1 : +j.hours, cell: j => (j.hours == null ? '—' : (+j.hours).toFixed(2)) },
@@ -234,7 +234,7 @@
     function passes(j) {
       for (const key of ['brand', 'channel', 'type']) { if (F[key].size && !VAL[key](j).some(v => F[key].has(v))) return false; }
       if (F.date) { const cutoff = Date.now() - Number(F.date) * 86400000; const t = j.deliveredISO ? new Date(j.deliveredISO).getTime() : NaN; if (isNaN(t) || t < cutoff) return false; }
-      if (F.q) { const hay = [j.jobNumber, j.title, VAL.brand(j).join(' '), j.brand, j.channel, j.assetType, j.stakeholder].join(' ').toLowerCase(); if (!hay.includes(F.q)) return false; }
+      if (F.q) { const hay = [j.jobNumber, VAL.brand(j).join(' '), j.brand, j.channel, j.assetType, j.stakeholder].join(' ').toLowerCase(); if (!hay.includes(F.q)) return false; }
       return true;
     }
     function clearAll() {
