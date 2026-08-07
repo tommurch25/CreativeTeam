@@ -5,7 +5,7 @@
   if (reduce || !('IntersectionObserver' in window)) return;
 
   var FADE = '.hero, .section-head, .table-card, .dfilter, .vregions, .chart-card';
-  var STAG = '.grid, .res-grid, .kpi-strip, #varea';
+  var STAG = '.grid, .res-grid, .kpi-strip, .team-grid, #varea';
 
   function init() {
     var fade = [].slice.call(document.querySelectorAll(FADE));

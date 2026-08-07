@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team — Creative Hub</title>
+  <link rel="icon" href="assets/logos/favicon_master.svg" />
+  <link rel="stylesheet" href="assets/styles.css?v=17" />
+  <script src="assets/app.js?v=17" defer></script>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html" aria-label="Quantum Creative Hub" style="display:flex;align-items:center;gap:12px;">
+        <img src="assets/logos/quantum_logo_master_blue.svg" alt="Quantum" />
+        <span style="color:var(--chrome-dark-40);">|</span>
+        <span style="font-weight:600;color:var(--muted);font-size:0.95rem;">Creative Hub</span>
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="index.html">Home</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="team.html" class="active">Team</a>
+        <a href="data.html">Data</a>
+        <a href="resources.html">Resources</a>
+        <a class="nav-cta" href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
+      </div>
+      <button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <main class="banded">
+    <div class="band band-grey"><div class="wrap">
+      <section class="hero compact">
+        <div class="eyebrow"><span class="dot"></span> Team</div>
+        <h1>Meet the team.</h1>
+        <p class="lead">We are Quantum's AI-led creative engine, delivering high-quality creative at pace and scale to drive performance, elevate brands, and engage audiences across every channel, vertical, and geography.</p>
+      </section>
+    </div></div>
+
+    <!-- Structure + team. For a real photo, replace the initials with: <img class="ta-img" src="assets/team/name.jpg" alt="Name"> -->
+    <div class="band band-white"><div class="wrap">
+      <div class="team-leads">
+        <div class="lead-block"><div class="lead-eyebrow">Design</div><p>Richard oversees our digital design output across motion, static, and brand assets, supporting a wide range of teams and channels across the business. His team includes Zaid, Charlie, Ben, and Eoin.</p></div>
+        <div class="lead-block copy"><div class="lead-eyebrow">Copy &amp; content</div><p>Joe leads all copy and content output, supporting brands with everything from campaign messaging to ongoing content.</p></div>
+      </div>
+      <div class="team-subhead"><h3>Check out who's working on what across the Creative Team.</h3></div>
+      <div class="team-grid">
+        <div class="team-card" data-owner="Rich"><div class="team-head"><div class="team-avatar">RM</div><div class="tinfo"><div class="team-name">Richard Morton</div><div class="team-role">Creative Lead</div></div><span class="team-count">—</span></div><div class="team-jobs"></div></div>
+        <div class="team-card" data-owner="Joe"><div class="team-head"><div class="team-avatar">JK</div><div class="tinfo"><div class="team-name">Joe Khalique-Brown</div><div class="team-role">Brand Copywriter &amp; Content Manager</div></div><span class="team-count">—</span></div><div class="team-jobs"></div></div>
+        <div class="team-card" data-owner="Zaid"><div class="team-head"><div class="team-avatar">ZA</div><div class="tinfo"><div class="team-name">Zaid Arabi-Katbi</div><div class="team-role">Senior Digital Designer</div></div><span class="team-count">—</span></div><div class="team-jobs"></div></div>
+        <div class="team-card" data-owner="Charlie"><div class="team-head"><div class="team-avatar">CG</div><div class="tinfo"><div class="team-name">Charlie Gardner</div><div class="team-role">Digital Designer</div></div><span class="team-count">—</span></div><div class="team-jobs"></div></div>
+        <div class="team-card" data-owner="Ben"><div class="team-head"><div class="team-avatar">BR</div><div class="tinfo"><div class="team-name">Ben Richards</div><div class="team-role">Digital Designer</div></div><span class="team-count">—</span></div><div class="team-jobs"></div></div>
+        <div class="team-card" data-owner="Eoin"><div class="team-head"><div class="team-avatar">EM</div><div class="tinfo"><div class="team-name">Eoin McDermott</div><div class="team-role">Junior Digital Designer</div></div><span class="team-count">—</span></div><div class="team-jobs"></div></div>
+        <div class="team-card" data-owner="Tom"><div class="team-head"><div class="team-avatar">TM</div><div class="tinfo"><div class="team-name">Tom Murch</div><div class="team-role">Creative Director</div></div><span class="team-count">—</span></div><div class="team-jobs"></div></div>
+      </div>
+    </div></div>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <span>Quantum Creative Hub</span>
+      <span>Internal use only · V1.02</span>
+    </div>
+  </footer>
+
+  <script>
+    const DATA_URL = 'https://script.google.com/macros/s/AKfycbz10YPP7Fk9U_Y-WXpAuRXsvrBU4mWvNlfU9jXVY1pB2g8e9Y2pVlc7gZLv8E5Y5FtWXQ/exec';
+    let INPROGRESS = [];
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+
+    function renderTeam() {
+      document.querySelectorAll('.team-card[data-owner]').forEach(card => {
+        const owner = card.dataset.owner;
+        const jobs = INPROGRESS.filter(j => j.owner === owner);
+        const badge = card.querySelector('.team-count');
+        const list = card.querySelector('.team-jobs');
+        badge.textContent = jobs.length + ' in progress';
+        badge.classList.toggle('zero', jobs.length === 0);
+        if (!jobs.length) { list.innerHTML = '<div class="team-empty">Nothing in progress right now.</div>'; return; }
+        list.innerHTML = jobs.map(j => {
+          const jn = j.trelloUrl ? `<a href="${j.trelloUrl}" target="_blank" rel="noopener">${esc(j.jobNumber)}</a>` : esc(j.jobNumber);
+          const over = j.status === 'Overdue' ? ' <span class="tj-over">Overdue</span>' : '';
+          return `<div class="tj-row"><span class="tj-jn">${jn}</span><span class="tj-title" title="${esc(j.title || '')}">${esc(j.title || '—')}${over}</span></div>`;
+        }).join('');
+      });
+    }
+
+    async function load() {
+      try { const r = await fetch(DATA_URL, { cache: 'no-store' }); const d = await r.json(); INPROGRESS = d.inProgress || []; }
+      catch (e) { document.querySelectorAll('.team-count').forEach(b => { b.textContent = '—'; }); }
+      renderTeam();
+    }
+    load();
+  </script>
+</body>
+</html>
