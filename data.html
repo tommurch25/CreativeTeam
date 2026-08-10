@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Data — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=22" />
-  <script src="assets/app.js?v=22" defer></script>
+  <link rel="stylesheet" href="assets/styles.css?v=25" />
+  <script src="assets/app.js?v=25" defer></script>
 </head>
 <body>
   <nav class="nav">
@@ -22,6 +22,7 @@
         <a href="team.html">Team</a>
         <a href="data.html" class="active">Data</a>
         <a href="resources.html">Resources</a>
+        <a href="showcase.html">Showcase</a>
         <a class="nav-cta" href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
       </div>
       <button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
@@ -62,11 +63,11 @@
     <div class="band band-white">
       <div class="wrap">
         <div class="kpi-strip" id="kpis">
-          <div class="kpi"><div class="kpi-value" id="k-briefs">—</div><div class="kpi-label">Briefs delivered</div></div>
-          <div class="kpi"><div class="kpi-value" id="k-assets">—</div><div class="kpi-label">Assets delivered</div></div>
-          <div class="kpi"><div class="kpi-value" id="k-hours">—</div><div class="kpi-label">Hours logged</div></div>
-          <div class="kpi"><div class="kpi-value" id="k-avg">—</div><div class="kpi-label">Avg hours / brief</div></div>
-          <div class="kpi"><div class="kpi-value" id="k-brands">—</div><div class="kpi-label">Active brands</div></div>
+          <div class="kpi"><div class="kpi-value" id="k-briefs">—</div><div class="kpi-label">Briefs delivered</div><div class="kpi-delta" id="kd-briefs"></div></div>
+          <div class="kpi"><div class="kpi-value" id="k-assets">—</div><div class="kpi-label">Assets delivered</div><div class="kpi-delta" id="kd-assets"></div></div>
+          <div class="kpi"><div class="kpi-value" id="k-hours">—</div><div class="kpi-label">Hours logged</div><div class="kpi-delta" id="kd-hours"></div></div>
+          <div class="kpi"><div class="kpi-value" id="k-avg">—</div><div class="kpi-label">Avg hours / brief</div><div class="kpi-delta" id="kd-avg"></div></div>
+          <div class="kpi"><div class="kpi-value" id="k-brands">—</div><div class="kpi-label">Active brands</div><div class="kpi-delta" id="kd-brands"></div></div>
         </div>
         <div class="section-head acc-rose">
           <h2>The headlines</h2>
@@ -496,25 +497,47 @@
       }
       const filtered = ALLDELIVERED.filter(j => inRange(j.deliveredISO, p.start, p.end));
       document.getElementById('period-count').textContent = filtered.length + (filtered.length === 1 ? ' brief' : ' briefs') + ' in period';
-      renderAll(filtered);
+      renderAll(filtered, p);
       renderComparison(p);
       try { localStorage.setItem(LS_KEY, JSON.stringify({ lens: LENS, idx: LENSIDX })); } catch (e) {}
     }
 
     function num2(el, to, fmt) { if (window.animateNumber) window.animateNumber(el, to, fmt); else el.textContent = (fmt || function (v) { return Math.round(v); })(to); }
-    function renderKpis(delivered) {
-      const briefs = delivered.length;
+    function metricsFor(list) {
       let assets = 0, hours = 0; const bset = new Set();
-      delivered.forEach(j => { assets += num(j.assets); hours += num(j.hours); [...new Set(brandCodes(j))].forEach(c => bset.add(c)); });
-      num2(document.getElementById('k-briefs'), briefs, v => Math.round(v).toLocaleString());
-      num2(document.getElementById('k-assets'), assets, v => Math.round(v).toLocaleString());
-      num2(document.getElementById('k-hours'), hours, v => Math.round(v).toLocaleString() + 'h');
-      num2(document.getElementById('k-avg'), briefs ? hours / briefs : 0, v => v.toFixed(1) + 'h');
-      num2(document.getElementById('k-brands'), bset.size, v => String(Math.round(v)));
+      list.forEach(j => { assets += num(j.assets); hours += num(j.hours); [...new Set(brandCodes(j))].forEach(c => bset.add(c)); });
+      const briefs = list.length;
+      return { briefs, assets, hours, avg: briefs ? hours / briefs : 0, brands: bset.size };
+    }
+    function setKpiDelta(id, cur, prev, prevLabel) {
+      const el = document.getElementById(id); if (!el) return;
+      if (prev == null) { el.textContent = ''; el.className = 'kpi-delta'; return; }
+      const d = prev ? Math.round((cur - prev) / prev * 100) : (cur ? 100 : 0);
+      const dir = cur > prev ? 'up' : cur < prev ? 'down' : 'flat';
+      const arrow = dir === 'up' ? '▲' : dir === 'down' ? '▼' : '–', sign = d > 0 ? '+' : '';
+      el.className = 'kpi-delta ' + dir;
+      el.innerHTML = `${arrow} ${sign}${d}% <span class="kpi-delta-ref">vs ${prevLabel}</span>`;
+    }
+    function renderKpis(delivered, p) {
+      const cur = metricsFor(delivered);
+      num2(document.getElementById('k-briefs'), cur.briefs, v => Math.round(v).toLocaleString());
+      num2(document.getElementById('k-assets'), cur.assets, v => Math.round(v).toLocaleString());
+      num2(document.getElementById('k-hours'), cur.hours, v => Math.round(v).toLocaleString() + 'h');
+      num2(document.getElementById('k-avg'), cur.avg, v => v.toFixed(1) + 'h');
+      num2(document.getElementById('k-brands'), cur.brands, v => String(Math.round(v)));
+      const prev = p ? previousPeriod(p) : null;
+      const ids = ['kd-briefs', 'kd-assets', 'kd-hours', 'kd-avg', 'kd-brands'];
+      if (!prev) { ids.forEach(id => setKpiDelta(id, 0, null)); return; }
+      const pv = metricsFor(ALLDELIVERED.filter(j => inRange(j.deliveredISO, prev.start, prev.end)));
+      setKpiDelta('kd-briefs', cur.briefs, pv.briefs, prev.label);
+      setKpiDelta('kd-assets', cur.assets, pv.assets, prev.label);
+      setKpiDelta('kd-hours', cur.hours, pv.hours, prev.label);
+      setKpiDelta('kd-avg', cur.avg, pv.avg, prev.label);
+      setKpiDelta('kd-brands', cur.brands, pv.brands, prev.label);
     }
 
-    function renderAll(delivered) {
-      renderKpis(delivered);
+    function renderAll(delivered, p) {
+      renderKpis(delivered, p);
       renderHeadlines(delivered, META);
       renderBrandActivity(delivered, META);
       renderPeople(delivered);

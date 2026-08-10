@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Showcase — Creative Hub</title>
+  <link rel="icon" href="assets/logos/favicon_master.svg" />
+  <link rel="stylesheet" href="assets/styles.css?v=25" />
+  <script src="assets/app.js?v=25" defer></script>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html" aria-label="Quantum Creative Hub" style="display:flex;align-items:center;gap:12px;">
+        <img src="assets/logos/quantum_logo_master_blue.svg" alt="Quantum" />
+        <span style="color:var(--chrome-dark-40);">|</span>
+        <span style="font-weight:600;color:var(--muted);font-size:0.95rem;">Creative Hub</span>
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="index.html">Home</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="team.html">Team</a>
+        <a href="data.html">Data</a>
+        <a href="resources.html">Resources</a>
+        <a href="showcase.html" class="active">Showcase</a>
+        <a class="nav-cta" href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
+      </div>
+      <button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <main class="banded">
+    <div class="band band-grey"><div class="wrap">
+      <section class="hero compact">
+        <div class="eyebrow"><span class="dot"></span> Showcase</div>
+        <h1>The work we're proud of.</h1>
+        <p class="lead">Case studies and standout projects from across the creative team — the campaigns, builds and ideas worth showing off.</p>
+      </section>
+    </div></div>
+
+    <!--
+      Each .sc-row is one case study. To wire one up:
+        1. Set href to the case-study HTML (e.g. href="showcase/rewards-launch.html").
+        2. For a real cover image, add  <img class="sc-img" src="assets/showcase/your-image.jpg" alt="" />  as the first child of .sc-cover.
+        3. Edit the tags, title and summary. Swap the tone-* class (rose / orange / green / purple / navy) for the placeholder colour.
+      Duplicate a row to add more.
+    -->
+    <div class="band band-white"><div class="wrap">
+      <div class="sc-list">
+        <a class="sc-row" href="CaseStudy-BonusBurnout.html">
+          <div class="sc-cover">
+            <img class="sc-img" src="assets/showcase/bonus-burnout.jpg" alt="Bonus Burnout racing game key art" />
+          </div>
+          <div class="sc-body">
+            <div class="sc-tags"><span class="sc-tag brand">SlotsWise</span><span class="sc-tag">Game</span><span class="sc-tag">AI</span><span class="sc-tag">Interactive</span></div>
+            <div class="sc-title">Bonus Burnout</div>
+            <div class="sc-sum">A fully playable racing game for SlotsWise, built end to end with AI in the loop. Fifty unique elements, an AI video background and multiple player journeys — shipped in a single working day.</div>
+            <span class="sc-cta">Read the case study →</span>
+          </div>
+        </a>
+
+        <a class="sc-row" href="CaseStudy-WorldCup2026.html">
+          <div class="sc-cover">
+            <img class="sc-img" src="assets/showcase/ai-production-case-study.jpg" alt="World Cup 2026 creative key art" />
+          </div>
+          <div class="sc-body">
+            <div class="sc-tags"><span class="sc-tag brand">Betway</span><span class="sc-tag">AI</span><span class="sc-tag">Production</span><span class="sc-tag">World Cup</span></div>
+            <div class="sc-title">AI Production Case Study</div>
+            <div class="sc-sum">A deep dive into two World Cup campaigns four years apart — a production-heavy 2022 campaign at Betway, and our new AI-led creative for 2026. See how AI has genuinely changed the way we produce.</div>
+            <span class="sc-cta">Read the case study →</span>
+          </div>
+        </a>
+
+      </div>
+    </div></div>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <span>Quantum Creative Hub</span>
+      <span>Internal use only · V1.02</span>
+    </div>
+  </footer>
+</body>
+</html>
