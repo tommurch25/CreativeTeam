@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Data — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=25" />
-  <script src="assets/app.js?v=25" defer></script>
+  <link rel="stylesheet" href="assets/styles.css?v=26" />
+  <script src="assets/app.js?v=26" defer></script>
 </head>
 <body>
   <nav class="nav">
@@ -40,6 +40,7 @@
             <div class="period-bar">
               <span class="period-label">Period</span>
               <div class="period-lens" id="period-lens">
+                <button type="button" data-lens="week">Week</button>
                 <button type="button" data-lens="month">Month</button>
                 <button type="button" data-lens="quarter">Quarter</button>
                 <button type="button" data-lens="fy">FY</button>
@@ -442,7 +443,7 @@
     }
 
     // ---- Period filter + month-over-month comparison ----
-    let ALLDELIVERED = [], META = {}, MONTHCHART = null, LENSPERIODS = {}, LENS = 'month', LENSIDX = { month: 0, quarter: 0, fy: 0, all: 0 };
+    let ALLDELIVERED = [], META = {}, MONTHCHART = null, LENSPERIODS = {}, LENS = 'month', LENSIDX = { week: 0, month: 0, quarter: 0, fy: 0, all: 0 };
     const LS_KEY = 'qch-data-period';
     const pad2 = n => String(n).padStart(2, '0');
     const iso = d => d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
@@ -456,11 +457,13 @@
     const monthPeriod = (y, mo) => ({ kind: 'month', yy: y, mo, label: MSHORT[mo] + ' ' + y, start: iso(new Date(y, mo, 1)), end: iso(new Date(y, mo + 1, 1)) });
     const quarterPeriod = (q, fy) => { const r = quarterRange(q, fy); return { kind: 'quarter', q, fy, label: 'Q' + q + ' FY' + pad2(fy % 100), start: r.start, end: r.end }; };
     const fyPeriod = fy => { const r = fyRange(fy); return { kind: 'fy', fy, label: 'FY' + pad2(fy % 100), start: r.start, end: r.end }; };
+    const weekStart = d => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); const dow = (x.getDay() + 6) % 7; x.setDate(x.getDate() - dow); return x; };
+    const weekPeriod = mon => { const end = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 7); return { kind: 'week', ws: iso(mon), label: 'w/c ' + mon.getDate() + ' ' + MSHORT[mon.getMonth()], start: iso(mon), end: iso(end) }; };
 
     function buildPeriods() {
       const now = new Date(), endD = new Date(now.getFullYear(), now.getMonth(), 1);
-      let minKey = null;
-      ALLDELIVERED.forEach(j => { const k = j.deliveredISO.slice(0, 7); if (!minKey || k < minKey) minKey = k; });
+      let minKey = null, minDate = null;
+      ALLDELIVERED.forEach(j => { const k = j.deliveredISO.slice(0, 7); if (!minKey || k < minKey) minKey = k; const dk = j.deliveredISO.slice(0, 10); if (!minDate || dk < minDate) minDate = dk; });
       const sY = minKey ? +minKey.slice(0, 4) : now.getFullYear(), sMo = minKey ? +minKey.slice(5, 7) - 1 : now.getMonth();
       const months = [];
       let d = new Date(sY, sMo, 1);
@@ -471,10 +474,13 @@
         if (!qSeen.has(fy + '-' + q)) { qSeen.add(fy + '-' + q); quarters.push(quarterPeriod(q, fy)); }
         if (!fySeen.has(fy)) { fySeen.add(fy); fys.push(fyPeriod(fy)); }
       });
-      LENSPERIODS = { month: months, quarter: quarters, fy: fys, all: [{ kind: 'all', label: 'All time', start: null, end: null }] };
+      const weeks = [], curWeek = weekStart(now);
+      let wd = minDate ? weekStart(new Date(minDate + 'T00:00:00')) : curWeek;
+      while (wd <= curWeek) { weeks.push(weekPeriod(wd)); wd = new Date(wd.getFullYear(), wd.getMonth(), wd.getDate() + 7); }
+      LENSPERIODS = { week: weeks, month: months, quarter: quarters, fy: fys, all: [{ kind: 'all', label: 'All time', start: null, end: null }] };
     }
 
-    const defaultIndex = lens => { const arr = LENSPERIODS[lens] || []; return lens === 'month' ? Math.max(0, arr.length - 2) : Math.max(0, arr.length - 1); };
+    const defaultIndex = lens => { const arr = LENSPERIODS[lens] || []; return (lens === 'month' || lens === 'week') ? Math.max(0, arr.length - 2) : Math.max(0, arr.length - 1); };
 
     function wireControls() {
       document.querySelectorAll('#period-lens button').forEach(b => b.addEventListener('click', () => { LENS = b.dataset.lens; applyPeriod(); }));
@@ -548,6 +554,7 @@
 
     const rangeTotals = (s, e) => { let b = 0, h = 0, a = 0; ALLDELIVERED.forEach(j => { if (inRange(j.deliveredISO, s, e)) { b++; h += num(j.hours); a += num(j.assets); } }); return { b, h, a }; };
     function previousPeriod(p) {
+      if (p.kind === 'week') { const mon = new Date(p.ws + 'T00:00:00'); const pm = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() - 7); return { label: 'w/c ' + pm.getDate() + ' ' + MSHORT[pm.getMonth()], start: iso(pm), end: iso(mon) }; }
       if (p.kind === 'month') { const d = new Date(p.yy, p.mo - 1, 1); return { label: MSHORT[d.getMonth()] + ' ' + d.getFullYear(), start: iso(new Date(d.getFullYear(), d.getMonth(), 1)), end: iso(new Date(d.getFullYear(), d.getMonth() + 1, 1)) }; }
       if (p.kind === 'quarter') { const pq = p.q === 1 ? 4 : p.q - 1, pf = p.q === 1 ? p.fy - 1 : p.fy, r = quarterRange(pq, pf); return { label: 'Q' + pq + ' FY' + pad2(pf % 100), start: r.start, end: r.end }; }
       if (p.kind === 'fy') { const pf = p.fy - 1, r = fyRange(pf); return { label: 'FY' + pad2(pf % 100), start: r.start, end: r.end }; }
@@ -583,11 +590,11 @@
       META = data.brandMeta || {};
       document.querySelectorAll('.chart-loading').forEach(el => el.remove());
       buildPeriods();
-      ['month', 'quarter', 'fy', 'all'].forEach(l => { LENSIDX[l] = defaultIndex(l); });
+      ['week', 'month', 'quarter', 'fy', 'all'].forEach(l => { LENSIDX[l] = defaultIndex(l); });
       let saved = null; try { saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch (e) {}
       if (saved && saved.lens && LENSPERIODS[saved.lens] && LENSPERIODS[saved.lens].length) {
         LENS = saved.lens;
-        if (saved.idx) ['month', 'quarter', 'fy', 'all'].forEach(l => { if (LENSPERIODS[l] && typeof saved.idx[l] === 'number' && saved.idx[l] < LENSPERIODS[l].length) LENSIDX[l] = saved.idx[l]; });
+        if (saved.idx) ['week', 'month', 'quarter', 'fy', 'all'].forEach(l => { if (LENSPERIODS[l] && typeof saved.idx[l] === 'number' && saved.idx[l] < LENSPERIODS[l].length) LENSIDX[l] = saved.idx[l]; });
       }
       wireControls();
       applyPeriod();
