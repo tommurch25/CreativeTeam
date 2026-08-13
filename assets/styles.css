@@ -601,8 +601,20 @@ td.empty { text-align: center; color: var(--muted); padding: 30px; }
 .notice strong { font-weight: 700; }
 
 /* ---------- Footer ---------- */
-footer { border-top: 1px solid var(--line); padding: 28px 0; color: var(--muted); font-size: 0.82rem; }
+footer { background: var(--chrome-dark); color: rgba(255,255,255,0.72); }
 .footer-inner { display: flex; align-items: center; justify-content: space-between; }
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; padding: 48px 0 34px; }
+.foot-logo { height: 26px; margin-bottom: 14px; }
+.foot-tag { color: rgba(255,255,255,0.6); font-size: 0.9rem; line-height: 1.55; max-width: 330px; margin: 0 0 16px; }
+.foot-corp { color: #fff; font-weight: 700; font-size: 0.9rem; text-decoration: none; }
+.foot-corp:hover { color: var(--quantum-blue-40); }
+.foot-col-title { color: #fff; font-weight: 800; font-size: 0.76rem; letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 15px; }
+.foot-nav, .foot-actions { display: flex; flex-direction: column; gap: 11px; }
+.foot-nav a, .foot-actions a { color: rgba(255,255,255,0.72); text-decoration: none; font-size: 0.9rem; font-weight: 600; width: fit-content; transition: color .15s ease; }
+.foot-nav a:hover, .foot-actions a:hover { color: #fff; }
+.foot-fb { display: inline-flex; align-items: center; gap: 8px; }
+.foot-fb svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.footer-bar { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.14); padding: 18px 0; font-size: 0.8rem; color: rgba(255,255,255,0.5); }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
@@ -614,4 +626,6 @@ footer { border-top: 1px solid var(--line); padding: 28px 0; color: var(--muted)
 @media (max-width: 620px) {
   .grid-3, .grid-4, .grid-2 { grid-template-columns: 1fr; }
   .footer-inner { flex-direction: column; gap: 8px; text-align: center; }
+  .footer-grid { grid-template-columns: 1fr; gap: 28px; padding: 36px 0 24px; }
+  .footer-bar { flex-direction: column; gap: 8px; text-align: center; }
 }
