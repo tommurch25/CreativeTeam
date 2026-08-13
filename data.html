@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Data — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=26" />
-  <script src="assets/app.js?v=26" defer></script>
+  <link rel="stylesheet" href="assets/styles.css?v=30" />
+  <script src="assets/app.js?v=30" defer></script>
 </head>
 <body>
   <nav class="nav">
@@ -515,13 +515,15 @@
       const briefs = list.length;
       return { briefs, assets, hours, avg: briefs ? hours / briefs : 0, brands: bset.size };
     }
-    function setKpiDelta(id, cur, prev, prevLabel) {
+    function setKpiDelta(id, cur, prev, prevLabel, inverse) {
       const el = document.getElementById(id); if (!el) return;
       if (prev == null) { el.textContent = ''; el.className = 'kpi-delta'; return; }
       const d = prev ? Math.round((cur - prev) / prev * 100) : (cur ? 100 : 0);
-      const dir = cur > prev ? 'up' : cur < prev ? 'down' : 'flat';
-      const arrow = dir === 'up' ? '▲' : dir === 'down' ? '▼' : '–', sign = d > 0 ? '+' : '';
-      el.className = 'kpi-delta ' + dir;
+      const arrow = cur > prev ? '▲' : cur < prev ? '▼' : '–', sign = d > 0 ? '+' : '';
+      // colour by good/bad, not just direction: for inverse metrics (avg hours/brief) a fall is good
+      const good = inverse ? cur < prev : cur > prev;
+      const cls = cur === prev ? 'flat' : (good ? 'up' : 'down');
+      el.className = 'kpi-delta ' + cls;
       el.innerHTML = `${arrow} ${sign}${d}% <span class="kpi-delta-ref">vs ${prevLabel}</span>`;
     }
     function renderKpis(delivered, p) {
@@ -538,7 +540,7 @@
       setKpiDelta('kd-briefs', cur.briefs, pv.briefs, prev.label);
       setKpiDelta('kd-assets', cur.assets, pv.assets, prev.label);
       setKpiDelta('kd-hours', cur.hours, pv.hours, prev.label);
-      setKpiDelta('kd-avg', cur.avg, pv.avg, prev.label);
+      setKpiDelta('kd-avg', cur.avg, pv.avg, prev.label, true);
       setKpiDelta('kd-brands', cur.brands, pv.brands, prev.label);
     }
 
