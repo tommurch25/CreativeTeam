@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Jobs — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=25" />
-  <script src="assets/app.js?v=25" defer></script>
+  <link rel="stylesheet" href="assets/styles.css?v=29" />
+  <script src="assets/app.js?v=29" defer></script>
 </head>
 <body>
   <nav class="nav">
@@ -120,6 +120,9 @@
     const codeOf = s => { const i = s.indexOf(' - '); return (i > -1 ? s.slice(0, i) : s).trim(); };
     const cells = s => String(s || '').split(',').map(x => x.trim()).filter(Boolean);
     const brandVals = j => cells(j.brand).map(codeOf).map(c => c === 'CAS' ? 'CBK' : c);
+    // Filter-only: expand combined codes so "SLW UK/US" is matched by both "SLW UK" and "SLW US".
+    const expandCode = c => { if (!c.includes('/')) return [c]; const parts = c.split('/').map(s => s.trim()); const first = parts[0], li = first.lastIndexOf(' '), prefix = li > -1 ? first.slice(0, li + 1) : ''; return parts.map((p, i) => (i === 0 || p.includes(' ')) ? p : prefix + p); };
+    const brandFilterVals = j => [...new Set(brandVals(j).flatMap(expandCode))];
     const numJN = s => parseInt(String(s || '').replace(/\D/g, ''), 10) || 0;
     const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 
@@ -207,7 +210,7 @@
     }
 
     // ----- Delivered filter + table -----
-    const VAL = { brand: brandVals, channel: j => cells(j.channel), type: j => (j.assetType ? [j.assetType.trim()] : []) };
+    const VAL = { brand: brandFilterVals, channel: j => cells(j.channel), type: j => (j.assetType ? [j.assetType.trim()] : []) };
     const uniqueValues = getVals => { const s = new Set(); DELIVERED.forEach(j => getVals(j).forEach(v => s.add(v))); return [...s].sort(); };
 
     function makeDropdown(mountId, label, key) {
