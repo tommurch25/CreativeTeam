@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Team — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=31" />
-  <script src="assets/app.js?v=31" defer></script>
+  <link rel="stylesheet" href="assets/styles.css?v=32" />
+  <script src="assets/app.js?v=32" defer></script>
 </head>
 <body>
   <nav class="nav">
@@ -87,7 +87,7 @@
 
   <script>
     const DATA_URL = 'https://script.google.com/macros/s/AKfycbz10YPP7Fk9U_Y-WXpAuRXsvrBU4mWvNlfU9jXVY1pB2g8e9Y2pVlc7gZLv8E5Y5FtWXQ/exec';
-    let INPROGRESS = [];
+    let INPROGRESS = [], ABSENCE = {};
     const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 
     function renderTeam() {
@@ -96,6 +96,19 @@
         const jobs = INPROGRESS.filter(j => j.owner === owner);
         const badge = card.querySelector('.team-count');
         const list = card.querySelector('.team-jobs');
+
+        // Away / out-soon flag, matched on the member's full name
+        const name = card.querySelector('.team-name').textContent.trim();
+        const a = ABSENCE[name];
+        const old = card.querySelector('.team-flag'); if (old) old.remove();
+        card.classList.remove('is-away');
+        if (a) {
+          const pill = document.createElement('div');
+          pill.className = 'team-flag ' + (a.state === 'away' ? 'away' : 'soon');
+          pill.textContent = (a.state === 'away' ? 'Away · back ' : 'Out soon · off ') + a.label;
+          card.querySelector('.tinfo').appendChild(pill);
+          if (a.state === 'away') card.classList.add('is-away');
+        }
         badge.textContent = jobs.length + ' in progress';
         badge.classList.toggle('zero', jobs.length === 0);
         if (!jobs.length) { list.innerHTML = '<div class="team-empty">Nothing in progress right now.</div>'; return; }
@@ -108,7 +121,7 @@
     }
 
     async function load() {
-      try { const r = await fetch(DATA_URL, { cache: 'no-store' }); const d = await r.json(); INPROGRESS = d.inProgress || []; }
+      try { const r = await fetch(DATA_URL, { cache: 'no-store' }); const d = await r.json(); INPROGRESS = d.inProgress || []; ABSENCE = d.absence || {}; }
       catch (e) { document.querySelectorAll('.team-count').forEach(b => { b.textContent = '—'; }); }
       renderTeam();
     }
