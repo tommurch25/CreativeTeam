@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Creative Hub</title>
+  <link rel="icon" href="assets/logos/favicon_master.svg" />
+  <link rel="stylesheet" href="assets/styles.css?v=34" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="assets/app.js?v=34" defer></script>
+</head>
+<body>
+  <!-- Standalone page: intentionally NOT linked from the main nav. Reachable by direct URL only. -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html" aria-label="Quantum Creative Hub" style="display:flex;align-items:center;gap:12px;">
+        <img src="assets/logos/quantum_logo_master_blue.svg" alt="Quantum" />
+        <span style="color:var(--chrome-dark-40);">|</span>
+        <span style="font-weight:600;color:var(--muted);font-size:0.95rem;">Creative Hub</span>
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="index.html">Home</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="team.html">Team</a>
+        <a href="data.html">Data</a>
+        <a href="resources.html">Resources</a>
+        <a href="showcase.html">Showcase</a>
+        <a class="nav-cta" href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
+      </div>
+      <button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <main class="banded">
+    <div class="band band-grey"><div class="wrap">
+      <section class="hero compact">
+        <div class="eyebrow"><span class="dot"></span> Dashboard</div>
+        <h1>Studio trends over time.</h1>
+        <p class="lead">How the creative team's output is moving period to period — volume, effort and mix, compared across weeks, months, quarters and financial years.</p>
+        <p class="meta period-count" id="dash-meta">Loading…</p>
+      </section>
+    </div></div>
+
+    <!-- Headline totals -->
+    <div class="band band-white"><div class="wrap">
+      <div class="section-head acc-rose">
+        <h2>Headline totals</h2>
+        <div class="head-right" style="flex-direction:column;align-items:flex-end;gap:8px;">
+          <div class="period-lens sec-lens" data-target="hl"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div>
+          <div class="period-lens sec-lens" id="metric-lens"><button type="button" data-metric="briefs">Briefs</button><button type="button" data-metric="assets">Assets</button><button type="button" data-metric="hours">Hours</button><button type="button" data-metric="avg">Avg hrs/brief</button></div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="hlChart"></canvas></div>
+      <p class="chart-note" id="hl-note"></p>
+    </div></div>
+
+    <!-- By brand -->
+    <div class="band band-grey"><div class="wrap">
+      <div class="section-head acc-orange"><h2>By brand</h2><div class="head-right"><div class="period-lens sec-lens" data-target="brand"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div></div></div>
+      <div class="chart-wrap"><canvas id="brandChart"></canvas></div>
+    </div></div>
+
+    <!-- By department -->
+    <div class="band band-white"><div class="wrap">
+      <div class="section-head acc-green"><h2>By department</h2><div class="head-right"><div class="period-lens sec-lens" data-target="chan"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div></div></div>
+      <div class="chart-wrap"><canvas id="chanChart"></canvas></div>
+    </div></div>
+
+    <!-- By asset type -->
+    <div class="band band-grey"><div class="wrap">
+      <div class="section-head acc-rose"><h2>By asset type</h2><div class="head-right"><div class="period-lens sec-lens" data-target="type"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div></div></div>
+      <div class="chart-wrap"><canvas id="typeChart"></canvas></div>
+    </div></div>
+  </main>
+
+  <footer>
+    <div class="wrap footer-grid">
+      <div class="foot-brand">
+        <img class="foot-logo" src="assets/logos/quantum_logo_white.svg" alt="Quantum" />
+        <p class="foot-tag">The creative team's hub — brief in work, follow jobs, and see how the studio is performing.</p>
+        <a class="foot-corp" href="https://www.quantum.media/" target="_blank" rel="noopener">quantum.media ↗</a>
+      </div>
+      <nav class="foot-nav" aria-label="Footer">
+        <div class="foot-col-title">Explore</div>
+        <a href="index.html">Home</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="team.html">Team</a>
+        <a href="data.html">Data</a>
+        <a href="resources.html">Resources</a>
+        <a href="showcase.html">Showcase</a>
+      </nav>
+      <div class="foot-actions">
+        <div class="foot-col-title">Get in touch</div>
+        <a class="foot-fb" href="https://slack.com/app_redirect?channel=U08KV5Q7B6W" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>Send feedback</a>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
+      </div>
+    </div>
+    <div class="wrap footer-bar">
+      <span>Quantum Creative Hub</span>
+      <span>Internal use only · V1.02</span>
+    </div>
+  </footer>
+
+  <script>
+    const DATA_URL = 'https://script.google.com/macros/s/AKfycbz10YPP7Fk9U_Y-WXpAuRXsvrBU4mWvNlfU9jXVY1pB2g8e9Y2pVlc7gZLv8E5Y5FtWXQ/exec';
+
+    let ROWS = [], META = {}, METRIC = 'briefs', CHARTS = {}, LISTS = {}, LENSES = { hl: 'month', brand: 'month', chan: 'month', type: 'month' };
+    const SHOW = { week: 12, month: 12, quarter: 8, fy: 6 };
+    const PALETTE = ['#0086ff', '#f42ca4', '#ff7900', '#12923a', '#7a17d1', '#143b76', '#00c19d', '#e0301e', '#b35c00', '#8b8f92'];
+
+    const pad2 = n => String(n).padStart(2, '0');
+    const iso = d => d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+    const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+    const codeOf = s => { const i = s.indexOf(' - '); return (i > -1 ? s.slice(0, i) : s).trim(); };
+    const cells = s => String(s || '').split(',').map(x => x.trim()).filter(Boolean);
+    const brandCodes = j => cells(j.brand).map(codeOf).map(c => c === 'CAS' ? 'CBK' : c);
+    const inRange = (v, s, e) => (!s || v >= s) && (!e || v < e);
+    const MSHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    // ---- period lists ----
+    const fyEndYear = (y, m) => m >= 10 ? y + 1 : y;
+    const fyQuarter = m => m >= 10 ? 1 : m <= 3 ? 2 : m <= 6 ? 3 : 4;
+    const fyRange = fy => ({ start: iso(new Date(fy - 1, 9, 1)), end: iso(new Date(fy, 9, 1)) });
+    const quarterRange = (q, fy) => { const st = { 1: [fy - 1, 9], 2: [fy, 0], 3: [fy, 3], 4: [fy, 6] }[q]; return { start: iso(new Date(st[0], st[1], 1)), end: iso(new Date(st[0], st[1] + 3, 1)) }; };
+    const weekStart = d => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); const dow = (x.getDay() + 6) % 7; x.setDate(x.getDate() - dow); return x; };
+
+    function buildLists() {
+      const now = new Date();
+      let minDate = null;
+      ROWS.forEach(j => { const k = j.deliveredISO.slice(0, 10); if (!minDate || k < minDate) minDate = k; });
+      const start = minDate ? new Date(minDate + 'T00:00:00') : now;
+
+      const months = [];
+      let d = new Date(start.getFullYear(), start.getMonth(), 1), endM = new Date(now.getFullYear(), now.getMonth(), 1);
+      while (d <= endM) { months.push({ label: MSHORT[d.getMonth()] + ' ' + String(d.getFullYear()).slice(2), start: iso(new Date(d.getFullYear(), d.getMonth(), 1)), end: iso(new Date(d.getFullYear(), d.getMonth() + 1, 1)) }); d = new Date(d.getFullYear(), d.getMonth() + 1, 1); }
+
+      const qSeen = new Set(), quarters = [], fySeen = new Set(), fys = [];
+      let dd = new Date(start.getFullYear(), start.getMonth(), 1);
+      while (dd <= endM) {
+        const m1 = dd.getMonth() + 1, fy = fyEndYear(dd.getFullYear(), m1), q = fyQuarter(m1);
+        if (!qSeen.has(fy + '-' + q)) { qSeen.add(fy + '-' + q); const r = quarterRange(q, fy); quarters.push({ label: 'Q' + q + ' FY' + pad2(fy % 100), start: r.start, end: r.end }); }
+        if (!fySeen.has(fy)) { fySeen.add(fy); const r = fyRange(fy); fys.push({ label: 'FY' + pad2(fy % 100), start: r.start, end: r.end }); }
+        dd = new Date(dd.getFullYear(), dd.getMonth() + 1, 1);
+      }
+
+      const weeks = [], curWeek = weekStart(now);
+      let wd = weekStart(start);
+      while (wd <= curWeek) { const e = new Date(wd.getFullYear(), wd.getMonth(), wd.getDate() + 7); weeks.push({ label: wd.getDate() + ' ' + MSHORT[wd.getMonth()], start: iso(wd), end: iso(e) }); wd = new Date(wd.getFullYear(), wd.getMonth(), wd.getDate() + 7); }
+
+      return { week: weeks, month: months, quarter: quarters, fy: fys };
+    }
+
+    function periodMetrics(p) {
+      let briefs = 0, assets = 0, hours = 0; const brand = {}, chan = {}, type = {};
+      ROWS.forEach(j => {
+        if (!inRange(j.deliveredISO, p.start, p.end)) return;
+        briefs++; assets += num(j.assets); hours += num(j.hours);
+        [...new Set(brandCodes(j))].forEach(c => brand[c] = (brand[c] || 0) + 1);
+        const chs = cells(j.channel); const hshare = num(j.hours) / (chs.length || 1);
+        chs.forEach(c => chan[c] = (chan[c] || 0) + hshare);
+        const ts = cells(j.assetType); const ashare = num(j.assets) / (ts.length || 1);
+        ts.forEach(t => type[t] = (type[t] || 0) + ashare);
+      });
+      return { label: p.label, briefs, assets, hours, avg: briefs ? hours / briefs : 0, brand, chan, type };
+    }
+
+    // top keys across all periods for a given map field
+    function topKeys(series, field, n) {
+      const tot = {};
+      series.forEach(s => { for (const k in s[field]) tot[k] = (tot[k] || 0) + s[field][k]; });
+      return Object.keys(tot).sort((a, b) => tot[b] - tot[a]).slice(0, n);
+    }
+
+    const BASE_OPTS = {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { font: { family: 'Proxima Nova' }, boxWidth: 12, padding: 12 } }, tooltip: { titleFont: { family: 'Proxima Nova' }, bodyFont: { family: 'Proxima Nova' } } },
+      scales: { x: { grid: { display: false }, ticks: { font: { family: 'Proxima Nova' } } }, y: { beginAtZero: true, ticks: { font: { family: 'Proxima Nova' } }, grid: { color: '#eef0f2' } } }
+    };
+
+    function draw(id, config) { if (CHARTS[id]) CHARTS[id].destroy(); CHARTS[id] = new Chart(document.getElementById(id), config); }
+
+    function seriesFor(lens) { return (LISTS[lens] || []).slice(-SHOW[lens]).map(periodMetrics); }
+    function setLensActive(target) {
+      document.querySelectorAll('.sec-lens[data-target="' + target + '"] button').forEach(b => b.classList.toggle('active', b.dataset.lens === LENSES[target]));
+    }
+
+    function renderHeadline() {
+      const series = seriesFor(LENSES.hl);
+      const labels = series.map(s => s.label);
+      const fmt = { briefs: 'Briefs delivered', assets: 'Assets delivered', hours: 'Hours logged', avg: 'Avg hours / brief' }[METRIC];
+      const vals = series.map(s => METRIC === 'avg' ? Math.round(s.avg * 10) / 10 : Math.round(s[METRIC]));
+      document.querySelectorAll('#metric-lens button').forEach(b => b.classList.toggle('active', b.dataset.metric === METRIC));
+      setLensActive('hl');
+      draw('hlChart', {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { type: 'bar', label: fmt, data: vals, backgroundColor: 'rgba(0,134,255,0.20)', borderColor: '#0086ff', borderWidth: 1, borderRadius: 4, order: 2 },
+            { type: 'line', label: 'Trend', data: vals, borderColor: '#0086ff', backgroundColor: '#0086ff', tension: 0.35, pointRadius: 3, pointHoverRadius: 5, borderWidth: 2.5, order: 1 }
+          ]
+        },
+        options: Object.assign({}, BASE_OPTS, { plugins: Object.assign({}, BASE_OPTS.plugins, { legend: { display: false } }) })
+      });
+      const first = vals[0], last = vals[vals.length - 1];
+      let note = '';
+      if (vals.length > 1 && first) { const d = Math.round((last - first) / first * 100); note = fmt + ' ' + (d >= 0 ? 'up ' : 'down ') + Math.abs(d) + '% across the ' + vals.length + ' ' + LENSES.hl + ' periods shown (' + labels[0] + ' → ' + labels[labels.length - 1] + ').'; }
+      document.getElementById('hl-note').textContent = note;
+    }
+
+    const STACKS = { brand: { id: 'brandChart', field: 'brand', top: 8 }, chan: { id: 'chanChart', field: 'chan', top: 7 }, type: { id: 'typeChart', field: 'type', top: 6 } };
+    function renderStacked(target) {
+      const cfg = STACKS[target];
+      const series = seriesFor(LENSES[target]);
+      const labels = series.map(s => s.label);
+      const keys = topKeys(series, cfg.field, cfg.top);
+      const datasets = keys.map((k, i) => {
+        const colour = (cfg.field === 'brand' && META[k] && META[k].colour) ? META[k].colour : PALETTE[i % PALETTE.length];
+        return { label: k, data: series.map(s => Math.round((s[cfg.field][k] || 0) * 10) / 10), backgroundColor: colour, borderWidth: 0, stack: 's' };
+      });
+      setLensActive(target);
+      draw(cfg.id, {
+        type: 'bar',
+        data: { labels, datasets },
+        options: Object.assign({}, BASE_OPTS, { scales: { x: Object.assign({ stacked: true }, BASE_OPTS.scales.x), y: Object.assign({ stacked: true }, BASE_OPTS.scales.y) } })
+      });
+    }
+
+    function renderAll() { renderHeadline(); renderStacked('brand'); renderStacked('chan'); renderStacked('type'); }
+
+    function wire() {
+      document.querySelectorAll('.sec-lens[data-target] button[data-lens]').forEach(b => b.addEventListener('click', () => {
+        const target = b.closest('.sec-lens').dataset.target;
+        LENSES[target] = b.dataset.lens;
+        if (target === 'hl') renderHeadline(); else renderStacked(target);
+      }));
+      document.querySelectorAll('#metric-lens button').forEach(b => b.addEventListener('click', () => { METRIC = b.dataset.metric; renderHeadline(); }));
+    }
+
+    async function load() {
+      try { const r = await fetch(DATA_URL, { cache: 'no-store' }); const d = await r.json(); ROWS = (d.delivered || []).filter(j => j.deliveredISO); META = d.brandMeta || {}; }
+      catch (e) { document.getElementById('dash-meta').textContent = 'Could not load the data feed.'; return; }
+      LISTS = buildLists();
+      document.getElementById('dash-meta').textContent = 'Live from the tracker — set the period on each section independently.';
+      wire();
+      renderAll();
+    }
+    load();
+  </script>
+</body>
+</html>

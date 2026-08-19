@@ -605,6 +605,17 @@ td.empty { text-align: center; color: var(--muted); padding: 30px; }
 .notice strong { font-weight: 700; }
 
 /* ---------- Footer ---------- */
+/* dashboard: compact period toggles that live on light section headers */
+.sec-lens { background: var(--canvas-alt); padding: 3px; }
+.sec-lens button { color: var(--muted); font-size: 0.8rem; font-weight: 700; padding: 6px 13px; }
+.sec-lens button:hover { background: #e7e9ec; }
+.sec-lens button.active { background: var(--quantum-blue); color: #fff; }
+@media (max-width: 620px) { .section-head { flex-wrap: wrap; } .section-head .head-right { align-items: flex-start !important; } }
+
+.chart-wrap { position: relative; height: 360px; margin-top: 6px; }
+.chart-note { margin-top: 14px; color: var(--muted); font-size: 0.88rem; }
+@media (max-width: 620px) { .chart-wrap { height: 300px; } }
+
 footer { background: var(--chrome-dark); color: rgba(255,255,255,0.72); }
 .footer-inner { display: flex; align-items: center; justify-content: space-between; }
 .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; padding: 48px 0 34px; }
