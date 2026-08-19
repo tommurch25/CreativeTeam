@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=34" />
+  <link rel="stylesheet" href="assets/styles.css?v=39" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-  <script src="assets/app.js?v=34" defer></script>
+  <script src="assets/app.js?v=39" defer></script>
 </head>
 <body>
   <!-- Standalone page: intentionally NOT linked from the main nav. Reachable by direct URL only. -->
@@ -41,6 +41,15 @@
       </section>
     </div></div>
 
+    <!-- Wins & watch-outs -->
+    <div class="band band-white"><div class="wrap">
+      <div class="section-head acc-green"><h2>Wins &amp; watch-outs</h2><span class="meta">Latest complete month vs the month before, plus live status.</span></div>
+      <div class="grid grid-2 insight-grid">
+        <div class="insight-col good"><h4><span class="ic-dot"></span>What's working</h4><ul id="wins"><li class="insight-empty">Loading…</li></ul></div>
+        <div class="insight-col watch"><h4><span class="ic-dot"></span>Areas to improve</h4><ul id="watch"><li class="insight-empty">Loading…</li></ul></div>
+      </div>
+    </div></div>
+
     <!-- Headline totals -->
     <div class="band band-white"><div class="wrap">
       <div class="section-head acc-rose">
@@ -54,22 +63,54 @@
       <p class="chart-note" id="hl-note"></p>
     </div></div>
 
+    <!-- Efficiency -->
+    <div class="band band-grey"><div class="wrap">
+      <div class="section-head acc-orange"><h2>Efficiency</h2><div class="head-right"><div class="period-lens sec-lens" data-target="eff"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div></div></div>
+      <h4 class="chart-h">Hours per asset <span class="chart-sub">lower is better</span></h4>
+      <div class="chart-wrap"><canvas id="hpaChart"></canvas></div>
+    </div></div>
+
+    <!-- On-time delivery -->
+    <div class="band band-white"><div class="wrap">
+      <div class="section-head acc-green"><h2>On-time delivery</h2>
+        <div class="head-right" style="flex-direction:column;align-items:flex-end;gap:8px;">
+          <div class="period-lens sec-lens" data-target="ontime"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div>
+          <div class="period-lens sec-lens ot-split"><button type="button" data-split="overall">Overall</button><button type="button" data-split="brand">By brand</button><button type="button" data-split="chan">By department</button><button type="button" data-split="type">By asset type</button></div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="otChart"></canvas></div>
+      <p class="chart-note" id="ot-note"></p>
+    </div></div>
+
     <!-- By brand -->
     <div class="band band-grey"><div class="wrap">
-      <div class="section-head acc-orange"><h2>By brand</h2><div class="head-right"><div class="period-lens sec-lens" data-target="brand"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div></div></div>
+      <div class="section-head acc-orange"><h2>By brand</h2><div class="head-right" style="flex-direction:column;align-items:flex-end;gap:8px;"><div class="period-lens sec-lens" data-target="brand"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div><div class="period-lens sec-lens view-lens" data-vtarget="brand"><button type="button" data-view="stacked">Stacked</button><button type="button" data-view="lines">Lines</button><button type="button" data-view="share">Share</button></div></div></div>
       <div class="chart-wrap"><canvas id="brandChart"></canvas></div>
     </div></div>
 
     <!-- By department -->
     <div class="band band-white"><div class="wrap">
-      <div class="section-head acc-green"><h2>By department</h2><div class="head-right"><div class="period-lens sec-lens" data-target="chan"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div></div></div>
+      <div class="section-head acc-green"><h2>By department</h2><div class="head-right" style="flex-direction:column;align-items:flex-end;gap:8px;"><div class="period-lens sec-lens" data-target="chan"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div><div class="period-lens sec-lens view-lens" data-vtarget="chan"><button type="button" data-view="stacked">Stacked</button><button type="button" data-view="lines">Lines</button><button type="button" data-view="share">Share</button></div></div></div>
       <div class="chart-wrap"><canvas id="chanChart"></canvas></div>
     </div></div>
 
     <!-- By asset type -->
     <div class="band band-grey"><div class="wrap">
-      <div class="section-head acc-rose"><h2>By asset type</h2><div class="head-right"><div class="period-lens sec-lens" data-target="type"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div></div></div>
+      <div class="section-head acc-rose"><h2>By asset type</h2><div class="head-right" style="flex-direction:column;align-items:flex-end;gap:8px;"><div class="period-lens sec-lens" data-target="type"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div><div class="period-lens sec-lens view-lens" data-vtarget="type"><button type="button" data-view="stacked">Stacked</button><button type="button" data-view="lines">Lines</button><button type="button" data-view="share">Share</button></div></div></div>
       <div class="chart-wrap"><canvas id="typeChart"></canvas></div>
+    </div></div>
+
+    <!-- Work in progress (live health) -->
+    <div class="band band-white"><div class="wrap">
+      <div class="section-head acc-rose"><h2>Work in progress</h2><span class="meta">Live snapshot from Trello.</span></div>
+      <div class="grid grid-3">
+        <div class="kpi"><div class="kpi-value" id="wip-prog">—</div><div class="kpi-label">In progress</div></div>
+        <div class="kpi"><div class="kpi-value" id="wip-pend">—</div><div class="kpi-label">Pending</div></div>
+        <div class="kpi"><div class="kpi-value" id="wip-over">—</div><div class="kpi-label">Overdue</div></div>
+      </div>
+      <h4 class="chart-h" style="margin-top:30px;">Live workload by designer</h4>
+      <div id="wip-load"></div>
+      <p class="chart-note" id="wip-oldest"></p>
     </div></div>
   </main>
 
@@ -104,7 +145,7 @@
   <script>
     const DATA_URL = 'https://script.google.com/macros/s/AKfycbz10YPP7Fk9U_Y-WXpAuRXsvrBU4mWvNlfU9jXVY1pB2g8e9Y2pVlc7gZLv8E5Y5FtWXQ/exec';
 
-    let ROWS = [], META = {}, METRIC = 'briefs', CHARTS = {}, LISTS = {}, LENSES = { hl: 'month', brand: 'month', chan: 'month', type: 'month' };
+    let ROWS = [], INPROGRESS = [], META = {}, METRIC = 'briefs', CHARTS = {}, LISTS = {}, LENSES = { hl: 'month', eff: 'month', ontime: 'month', brand: 'month', chan: 'month', type: 'month' }, VIEWS = { brand: 'stacked', chan: 'stacked', type: 'stacked' }, OTSPLIT = 'overall';
     const SHOW = { week: 12, month: 12, quarter: 8, fy: 6 };
     const PALETTE = ['#0086ff', '#f42ca4', '#ff7900', '#12923a', '#7a17d1', '#143b76', '#00c19d', '#e0301e', '#b35c00', '#8b8f92'];
 
@@ -151,17 +192,18 @@
     }
 
     function periodMetrics(p) {
-      let briefs = 0, assets = 0, hours = 0; const brand = {}, chan = {}, type = {};
+      let briefs = 0, assets = 0, hours = 0, otScored = 0, otOk = 0; const brand = {}, chan = {}, type = {};
       ROWS.forEach(j => {
         if (!inRange(j.deliveredISO, p.start, p.end)) return;
         briefs++; assets += num(j.assets); hours += num(j.hours);
+        if (typeof j.onTime === 'boolean') { otScored++; if (j.onTime) otOk++; }
         [...new Set(brandCodes(j))].forEach(c => brand[c] = (brand[c] || 0) + 1);
         const chs = cells(j.channel); const hshare = num(j.hours) / (chs.length || 1);
         chs.forEach(c => chan[c] = (chan[c] || 0) + hshare);
         const ts = cells(j.assetType); const ashare = num(j.assets) / (ts.length || 1);
         ts.forEach(t => type[t] = (type[t] || 0) + ashare);
       });
-      return { label: p.label, briefs, assets, hours, avg: briefs ? hours / briefs : 0, brand, chan, type };
+      return { label: p.label, briefs, assets, hours, avg: briefs ? hours / briefs : 0, otScored, otOk, brand, chan, type };
     }
 
     // top keys across all periods for a given map field
@@ -209,36 +251,154 @@
     }
 
     const STACKS = { brand: { id: 'brandChart', field: 'brand', top: 8 }, chan: { id: 'chanChart', field: 'chan', top: 7 }, type: { id: 'typeChart', field: 'type', top: 6 } };
-    function renderStacked(target) {
-      const cfg = STACKS[target];
+    const round1 = v => Math.round(v * 10) / 10;
+    const colourFor = (field, k, i) => (field === 'brand' && META[k] && META[k].colour) ? META[k].colour : PALETTE[i % PALETTE.length];
+    const periodTotal = (s, field) => { let t = 0; for (const k in s[field]) t += s[field][k]; return t; };
+    function setViewActive(target) { document.querySelectorAll('.view-lens[data-vtarget="' + target + '"] button').forEach(b => b.classList.toggle('active', b.dataset.view === VIEWS[target])); }
+
+    function renderBreakdown(target) {
+      const cfg = STACKS[target], view = VIEWS[target];
       const series = seriesFor(LENSES[target]);
       const labels = series.map(s => s.label);
       const keys = topKeys(series, cfg.field, cfg.top);
-      const datasets = keys.map((k, i) => {
-        const colour = (cfg.field === 'brand' && META[k] && META[k].colour) ? META[k].colour : PALETTE[i % PALETTE.length];
-        return { label: k, data: series.map(s => Math.round((s[cfg.field][k] || 0) * 10) / 10), backgroundColor: colour, borderWidth: 0, stack: 's' };
-      });
-      setLensActive(target);
-      draw(cfg.id, {
+      setLensActive(target); setViewActive(target);
+
+      if (view === 'lines') {
+        const datasets = keys.map((k, i) => { const c = colourFor(cfg.field, k, i); return { label: k, data: series.map(s => round1(s[cfg.field][k] || 0)), borderColor: c, backgroundColor: c, fill: false, tension: 0.3, pointRadius: 2, pointHoverRadius: 4, borderWidth: 2 }; });
+        draw(cfg.id, { type: 'line', data: { labels, datasets }, options: BASE_OPTS });
+        return;
+      }
+
+      if (view === 'share') {
+        const datasets = keys.map((k, i) => ({ label: k, data: series.map(s => { const t = periodTotal(s, cfg.field); return t ? Math.round((s[cfg.field][k] || 0) / t * 1000) / 10 : 0; }), backgroundColor: colourFor(cfg.field, k, i), borderWidth: 0, stack: 's' }));
+        datasets.push({ label: 'Other', data: series.map(s => { const t = periodTotal(s, cfg.field); if (!t) return 0; let top = 0; keys.forEach(k => top += (s[cfg.field][k] || 0)); return Math.round((t - top) / t * 1000) / 10; }), backgroundColor: '#d3d1c7', borderWidth: 0, stack: 's' });
+        draw(cfg.id, { type: 'bar', data: { labels, datasets }, options: Object.assign({}, BASE_OPTS, { scales: { x: Object.assign({ stacked: true }, BASE_OPTS.scales.x), y: Object.assign({}, BASE_OPTS.scales.y, { stacked: true, max: 100, ticks: { callback: v => v + '%', font: { family: 'Proxima Nova' } } }) } }) });
+        return;
+      }
+
+      // stacked absolute (default)
+      const datasets = keys.map((k, i) => ({ label: k, data: series.map(s => round1(s[cfg.field][k] || 0)), backgroundColor: colourFor(cfg.field, k, i), borderWidth: 0, stack: 's' }));
+      draw(cfg.id, { type: 'bar', data: { labels, datasets }, options: Object.assign({}, BASE_OPTS, { scales: { x: Object.assign({ stacked: true }, BASE_OPTS.scales.x), y: Object.assign({ stacked: true }, BASE_OPTS.scales.y) } }) });
+    }
+
+    // ---- Efficiency ----
+    function renderEff() {
+      const series = seriesFor(LENSES.eff), labels = series.map(s => s.label);
+      setLensActive('eff');
+      const hpa = series.map(s => s.assets ? round1(s.hours / s.assets) : 0);
+      draw('hpaChart', {
         type: 'bar',
-        data: { labels, datasets },
-        options: Object.assign({}, BASE_OPTS, { scales: { x: Object.assign({ stacked: true }, BASE_OPTS.scales.x), y: Object.assign({ stacked: true }, BASE_OPTS.scales.y) } })
+        data: { labels, datasets: [
+          { type: 'bar', label: 'Hours per asset', data: hpa, backgroundColor: 'rgba(255,121,0,0.18)', borderColor: '#ff7900', borderWidth: 1, borderRadius: 4, order: 2 },
+          { type: 'line', label: 'Trend', data: hpa, borderColor: '#ff7900', backgroundColor: '#ff7900', tension: 0.35, pointRadius: 3, borderWidth: 2.5, order: 1 }
+        ] },
+        options: Object.assign({}, BASE_OPTS, { plugins: Object.assign({}, BASE_OPTS.plugins, { legend: { display: false } }) })
       });
     }
 
-    function renderAll() { renderHeadline(); renderStacked('brand'); renderStacked('chan'); renderStacked('type'); }
+    // ---- On-time delivery (splittable) ----
+    const otRate = list => { let sc = 0, ok = 0; list.forEach(j => { if (typeof j.onTime === 'boolean') { sc++; if (j.onTime) ok++; } }); return { sc: sc, ok: ok }; };
+    const otCats = (j, split) => split === 'brand' ? [...new Set(brandCodes(j))] : split === 'chan' ? cells(j.channel) : split === 'type' ? cells(j.assetType) : [];
+    function otOpts(legend) {
+      return Object.assign({}, BASE_OPTS, { plugins: Object.assign({}, BASE_OPTS.plugins, { legend: { display: legend, labels: BASE_OPTS.plugins.legend.labels } }), scales: { x: BASE_OPTS.scales.x, y: Object.assign({}, BASE_OPTS.scales.y, { max: 100, ticks: { callback: v => v + '%', font: { family: 'Proxima Nova' } } }) } });
+    }
+    function renderOnTime() {
+      const periods = (LISTS[LENSES.ontime] || []).slice(-SHOW[LENSES.ontime]);
+      const labels = periods.map(p => p.label);
+      setLensActive('ontime');
+      document.querySelectorAll('.ot-split button').forEach(b => b.classList.toggle('active', b.dataset.split === OTSPLIT));
+      const note = document.getElementById('ot-note');
+      if (!ROWS.some(j => typeof j.onTime === 'boolean')) {
+        if (CHARTS.otChart) { CHARTS.otChart.destroy(); CHARTS.otChart = null; }
+        note.textContent = 'On-time data appears once the feed includes due-date scoring (enable it in the Apps Script).';
+        return;
+      }
+      note.textContent = 'Only jobs with a Trello due date are scored.';
+      if (OTSPLIT === 'overall') {
+        const data = periods.map(p => { const r = otRate(ROWS.filter(j => inRange(j.deliveredISO, p.start, p.end))); return r.sc ? Math.round(r.ok / r.sc * 100) : null; });
+        draw('otChart', { type: 'line', data: { labels, datasets: [{ label: 'On-time %', data: data, borderColor: '#12923a', backgroundColor: 'rgba(18,146,58,0.12)', fill: true, tension: 0.35, pointRadius: 3, borderWidth: 2.5, spanGaps: true }] }, options: otOpts(false) });
+        return;
+      }
+      const totalScored = {};
+      ROWS.forEach(j => { if (typeof j.onTime !== 'boolean') return; otCats(j, OTSPLIT).forEach(c => totalScored[c] = (totalScored[c] || 0) + 1); });
+      const keys = Object.keys(totalScored).filter(k => totalScored[k] >= 3).sort((a, b) => totalScored[b] - totalScored[a]).slice(0, 6);
+      const datasets = keys.map((k, i) => {
+        const c = (OTSPLIT === 'brand' && META[k] && META[k].colour) ? META[k].colour : PALETTE[i % PALETTE.length];
+        const data = periods.map(p => { const r = otRate(ROWS.filter(j => inRange(j.deliveredISO, p.start, p.end) && otCats(j, OTSPLIT).indexOf(k) > -1)); return r.sc ? Math.round(r.ok / r.sc * 100) : null; });
+        return { label: k, data: data, borderColor: c, backgroundColor: c, fill: false, tension: 0.3, pointRadius: 2, pointHoverRadius: 4, borderWidth: 2, spanGaps: true };
+      });
+      draw('otChart', { type: 'line', data: { labels, datasets: datasets }, options: otOpts(true) });
+    }
+
+    // ---- WIP health ----
+    function renderWip() {
+      const prog = INPROGRESS.filter(j => j.owner && j.status !== 'Pending').length;
+      const pend = INPROGRESS.filter(j => j.status === 'Pending').length;
+      const over = INPROGRESS.filter(j => j.status === 'Overdue').length;
+      document.getElementById('wip-prog').textContent = prog;
+      document.getElementById('wip-pend').textContent = pend;
+      document.getElementById('wip-over').textContent = over;
+      const load = {}; INPROGRESS.forEach(j => { if (j.owner && j.status !== 'Pending') load[j.owner] = (load[j.owner] || 0) + 1; });
+      const owners = Object.keys(load).sort((a, b) => load[b] - load[a]); const max = owners.length ? load[owners[0]] : 0;
+      document.getElementById('wip-load').innerHTML = owners.length ? owners.map(o => {
+        const w = max ? Math.round(load[o] / max * 100) : 0;
+        return '<div class="wl-row"><span class="wl-name">' + o + '</span><div class="wl-track"><div class="wl-fill" style="width:' + w + '%"></div></div><span class="wl-num">' + load[o] + '</span></div>';
+      }).join('') : '<p class="insight-empty">No live jobs.</p>';
+      const od = INPROGRESS.filter(j => j.status === 'Overdue' && j.dueISO).sort((a, b) => a.dueISO < b.dueISO ? -1 : 1);
+      document.getElementById('wip-oldest').textContent = od.length ? ('Longest overdue: ' + od[0].jobNumber + ' — ' + od[0].title + ' (was due ' + od[0].due + ').') : '';
+    }
+
+    // ---- Wins & watch-outs ----
+    const pctDelta = (cur, prev) => { if (!prev) return cur ? 100 : 0; return Math.round((cur - prev) / prev * 100); };
+    function biggestMover(cur, prev) { let best = null; for (const k in cur) { if ((prev[k] || 0) === 0) continue; const d = Math.round((cur[k] - prev[k]) / prev[k] * 100); if (!best || Math.abs(d) > Math.abs(best.d)) best = { name: k, d: d }; } return best; }
+    function computeInsights() {
+      const m = LISTS.month || [], good = [], watch = [];
+      if (m.length >= 3) {
+        const cur = periodMetrics(m[m.length - 2]), prev = periodMetrics(m[m.length - 3]), L = cur.label;
+        let d = pctDelta(cur.briefs, prev.briefs);
+        (d >= 0 ? good : watch).push('Briefs delivered <strong>' + (d >= 0 ? 'up ' : 'down ') + Math.abs(d) + '%</strong> in ' + L + ' (' + prev.briefs + ' → ' + cur.briefs + ').');
+        d = pctDelta(cur.assets, prev.assets);
+        (d >= 0 ? good : watch).push('Assets delivered <strong>' + (d >= 0 ? 'up ' : 'down ') + Math.abs(d) + '%</strong> (' + Math.round(prev.assets) + ' → ' + Math.round(cur.assets) + ').');
+        const hpaC = cur.assets ? cur.hours / cur.assets : 0, hpaP = prev.assets ? prev.hours / prev.assets : 0;
+        if (hpaP) { d = pctDelta(hpaC, hpaP); (d <= 0 ? good : watch).push('Hours per asset <strong>' + (d <= 0 ? 'down ' : 'up ') + Math.abs(d) + '%</strong> (' + round1(hpaP) + 'h → ' + round1(hpaC) + 'h)' + (d <= 0 ? ' — more efficient.' : ' — watch effort per asset.')); }
+        if (cur.otScored && prev.otScored) { const rc = Math.round(cur.otOk / cur.otScored * 100), rp = Math.round(prev.otOk / prev.otScored * 100); d = rc - rp; (d >= 0 ? good : watch).push('On-time delivery <strong>' + (d >= 0 ? 'up ' : 'down ') + Math.abs(d) + ' pts</strong> (' + rp + '% → ' + rc + '%).'); }
+        const mover = biggestMover(cur.brand, prev.brand);
+        if (mover) { if (mover.d >= 0) good.push('<strong>' + mover.name + '</strong> briefs up ' + mover.d + '% vs last month.'); else watch.push('<strong>' + mover.name + '</strong> briefs down ' + Math.abs(mover.d) + '% vs last month.'); }
+        const cb = Object.keys(cur.brand).length, pb = Object.keys(prev.brand).length;
+        if (cb > pb) good.push('Working across more brands (' + pb + ' → ' + cb + ').');
+      }
+      const over = INPROGRESS.filter(j => j.status === 'Overdue').length;
+      if (over > 0) watch.push('<strong>' + over + ' job' + (over > 1 ? 's' : '') + ' overdue</strong> right now.');
+      const load = {}; INPROGRESS.forEach(j => { if (j.owner && j.status !== 'Pending') load[j.owner] = (load[j.owner] || 0) + 1; });
+      const owners = Object.keys(load);
+      if (owners.length) { const top = owners.reduce((a, b) => load[b] > load[a] ? b : a); if (load[top] >= 6) watch.push('<strong>' + top + '</strong> is carrying ' + load[top] + ' live jobs — heaviest load.'); }
+      return { good: good, watch: watch };
+    }
+    function renderInsights() {
+      const r = computeInsights();
+      document.getElementById('wins').innerHTML = r.good.length ? r.good.slice(0, 5).map(t => '<li>' + t + '</li>').join('') : '<li class="insight-empty">Not enough data yet.</li>';
+      document.getElementById('watch').innerHTML = r.watch.length ? r.watch.slice(0, 5).map(t => '<li>' + t + '</li>').join('') : '<li class="insight-empty">Nothing flagged — nice.</li>';
+    }
+
+    function renderAll() { renderInsights(); renderHeadline(); renderEff(); renderOnTime(); renderBreakdown('brand'); renderBreakdown('chan'); renderBreakdown('type'); renderWip(); }
 
     function wire() {
       document.querySelectorAll('.sec-lens[data-target] button[data-lens]').forEach(b => b.addEventListener('click', () => {
         const target = b.closest('.sec-lens').dataset.target;
         LENSES[target] = b.dataset.lens;
-        if (target === 'hl') renderHeadline(); else renderStacked(target);
+        if (target === 'hl') renderHeadline(); else if (target === 'eff') renderEff(); else if (target === 'ontime') renderOnTime(); else renderBreakdown(target);
+      }));
+      document.querySelectorAll('.ot-split button[data-split]').forEach(b => b.addEventListener('click', () => { OTSPLIT = b.dataset.split; renderOnTime(); }));
+      document.querySelectorAll('.view-lens[data-vtarget] button[data-view]').forEach(b => b.addEventListener('click', () => {
+        const t = b.closest('.view-lens').dataset.vtarget;
+        VIEWS[t] = b.dataset.view;
+        renderBreakdown(t);
       }));
       document.querySelectorAll('#metric-lens button').forEach(b => b.addEventListener('click', () => { METRIC = b.dataset.metric; renderHeadline(); }));
     }
 
     async function load() {
-      try { const r = await fetch(DATA_URL, { cache: 'no-store' }); const d = await r.json(); ROWS = (d.delivered || []).filter(j => j.deliveredISO); META = d.brandMeta || {}; }
+      try { const r = await fetch(DATA_URL, { cache: 'no-store' }); const d = await r.json(); ROWS = (d.delivered || []).filter(j => j.deliveredISO); INPROGRESS = d.inProgress || []; META = d.brandMeta || {}; }
       catch (e) { document.getElementById('dash-meta').textContent = 'Could not load the data feed.'; return; }
       LISTS = buildLists();
       document.getElementById('dash-meta').textContent = 'Live from the tracker — set the period on each section independently.';
