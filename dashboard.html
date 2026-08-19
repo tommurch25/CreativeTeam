@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=40" />
+  <link rel="stylesheet" href="assets/styles.css?v=41" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-  <script src="assets/app.js?v=40" defer></script>
+  <script src="assets/app.js?v=41" defer></script>
 </head>
 <body>
   <!-- Standalone page: intentionally NOT linked from the main nav. Reachable by direct URL only. -->
@@ -106,6 +106,19 @@
       <div class="chart-wrap"><canvas id="typeChart"></canvas></div>
     </div></div>
 
+    <!-- By person -->
+    <div class="band band-white"><div class="wrap">
+      <div class="section-head acc-green"><h2>By person</h2>
+        <div class="head-right" style="flex-direction:column;align-items:flex-end;gap:8px;">
+          <div class="period-lens sec-lens p-metric"><button type="button" data-pmetric="eff">Hours / asset</button><button type="button" data-pmetric="ontime">On-time %</button><button type="button" data-pmetric="avg">Avg hrs / job</button></div>
+          <div class="period-lens sec-lens p-tf"><button type="button" data-ptf="30">30 days</button><button type="button" data-ptf="90">90 days</button><button type="button" data-ptf="fy">FY</button><button type="button" data-ptf="all">All time</button></div>
+        </div>
+      </div>
+      <p class="sec-desc">How team members compare on delivery and production, from Trello card members. Work on shared cards is split evenly, and people with few jobs in the window will read as noisier — check the sample sizes below the chart.</p>
+      <div class="chart-wrap"><canvas id="personChart"></canvas></div>
+      <p class="chart-note" id="person-note"></p>
+    </div></div>
+
     <!-- Work in progress (live health) -->
     <div class="band band-white"><div class="wrap">
       <div class="section-head acc-rose"><h2>Work in progress</h2><span class="meta">Live snapshot from Trello.</span></div>
@@ -152,7 +165,7 @@
   <script>
     const DATA_URL = 'https://script.google.com/macros/s/AKfycbz10YPP7Fk9U_Y-WXpAuRXsvrBU4mWvNlfU9jXVY1pB2g8e9Y2pVlc7gZLv8E5Y5FtWXQ/exec';
 
-    let ROWS = [], INPROGRESS = [], META = {}, METRIC = 'briefs', CHARTS = {}, LISTS = {}, LENSES = { hl: 'month', eff: 'month', ontime: 'month', brand: 'month', chan: 'month', type: 'month' }, VIEWS = { brand: 'stacked', chan: 'stacked', type: 'stacked' }, OTSPLIT = 'overall';
+    let ROWS = [], INPROGRESS = [], META = {}, METRIC = 'briefs', CHARTS = {}, LISTS = {}, LENSES = { hl: 'month', eff: 'month', ontime: 'month', brand: 'month', chan: 'month', type: 'month' }, VIEWS = { brand: 'stacked', chan: 'stacked', type: 'stacked' }, OTSPLIT = 'overall', PMETRIC = 'eff', PTF = 'all';
     const SHOW = { week: 12, month: 12, quarter: 8, fy: 6 };
     const PALETTE = ['#0086ff', '#f42ca4', '#ff7900', '#12923a', '#7a17d1', '#143b76', '#00c19d', '#e0301e', '#b35c00', '#8b8f92'];
 
@@ -337,6 +350,53 @@
       draw('otChart', { type: 'line', data: { labels, datasets: datasets }, options: otOpts(true) });
     }
 
+    // ---- By person (designer comparison via Trello card members) ----
+    function personRange() {
+      const now = new Date();
+      if (PTF === 'all') return { start: null, end: null };
+      if (PTF === 'fy') return fyRange(fyEndYear(now.getFullYear(), now.getMonth() + 1));
+      const days = +PTF, s = new Date(now.getFullYear(), now.getMonth(), now.getDate() - days);
+      return { start: iso(s), end: null };
+    }
+    function renderPerson() {
+      document.querySelectorAll('.p-metric button').forEach(b => b.classList.toggle('active', b.dataset.pmetric === PMETRIC));
+      document.querySelectorAll('.p-tf button').forEach(b => b.classList.toggle('active', b.dataset.ptf === PTF));
+      const range = personRange(), map = {};
+      ROWS.forEach(j => {
+        if (!inRange(j.deliveredISO, range.start, range.end)) return;
+        const ds = j.designer || []; if (!ds.length) return;
+        const share = 1 / ds.length;
+        ds.forEach(n => { const m = map[n] || (map[n] = { jobs: 0, assets: 0, hours: 0, otSc: 0, otOk: 0 }); m.jobs += share; m.assets += num(j.assets) * share; m.hours += num(j.hours) * share; if (typeof j.onTime === 'boolean') { m.otSc += share; if (j.onTime) m.otOk += share; } });
+      });
+      const note = document.getElementById('person-note');
+      const names = Object.keys(map);
+      if (!names.length) {
+        if (CHARTS.personChart) { CHARTS.personChart.destroy(); CHARTS.personChart = null; }
+        note.textContent = 'No designer-tagged jobs yet — this needs the Trello card-member step in the Apps Script.';
+        return;
+      }
+      const rows = names.map(n => {
+        const m = map[n]; let v;
+        if (PMETRIC === 'eff') v = m.assets ? m.hours / m.assets : null;
+        else if (PMETRIC === 'ontime') v = m.otSc ? m.otOk / m.otSc * 100 : null;
+        else v = m.jobs ? m.hours / m.jobs : null;
+        return { n: n, v: v, jobs: m.jobs };
+      }).filter(r => r.v != null);
+      rows.sort((a, b) => PMETRIC === 'ontime' ? b.v - a.v : a.v - b.v);
+      const label = PMETRIC === 'eff' ? 'Hours per asset' : PMETRIC === 'ontime' ? 'On-time %' : 'Avg hours per job';
+      const data = rows.map(r => PMETRIC === 'ontime' ? Math.round(r.v) : round1(r.v));
+      draw('personChart', {
+        type: 'bar',
+        data: { labels: rows.map(r => r.n), datasets: [{ label: label, data: data, backgroundColor: rows.map((r, i) => PALETTE[i % PALETTE.length]), borderWidth: 0, borderRadius: 4 }] },
+        options: Object.assign({}, BASE_OPTS, {
+          indexAxis: 'y',
+          plugins: Object.assign({}, BASE_OPTS.plugins, { legend: { display: false } }),
+          scales: { x: { beginAtZero: true, grid: { color: '#eef0f2' }, ticks: { callback: PMETRIC === 'ontime' ? (v => v + '%') : (v => v), font: { family: 'Proxima Nova' } } }, y: { grid: { display: false }, ticks: { font: { family: 'Proxima Nova' } } } }
+        })
+      });
+      note.textContent = 'Sample size (jobs, split on shared cards): ' + rows.map(r => r.n.split(' ')[0] + ' ' + Math.round(r.jobs)).join(' · ') + '.';
+    }
+
     // ---- WIP health ----
     function renderWip() {
       const prog = INPROGRESS.filter(j => j.owner && j.status !== 'Pending').length;
@@ -387,7 +447,7 @@
       document.getElementById('watch').innerHTML = r.watch.length ? r.watch.slice(0, 5).map(t => '<li>' + t + '</li>').join('') : '<li class="insight-empty">Nothing flagged — nice.</li>';
     }
 
-    function renderAll() { renderInsights(); renderHeadline(); renderEff(); renderOnTime(); renderBreakdown('brand'); renderBreakdown('chan'); renderBreakdown('type'); renderWip(); }
+    function renderAll() { renderInsights(); renderHeadline(); renderEff(); renderOnTime(); renderBreakdown('brand'); renderBreakdown('chan'); renderBreakdown('type'); renderPerson(); renderWip(); }
 
     function wire() {
       document.querySelectorAll('.sec-lens[data-target] button[data-lens]').forEach(b => b.addEventListener('click', () => {
@@ -396,6 +456,8 @@
         if (target === 'hl') renderHeadline(); else if (target === 'eff') renderEff(); else if (target === 'ontime') renderOnTime(); else renderBreakdown(target);
       }));
       document.querySelectorAll('.ot-split button[data-split]').forEach(b => b.addEventListener('click', () => { OTSPLIT = b.dataset.split; renderOnTime(); }));
+      document.querySelectorAll('.p-metric button[data-pmetric]').forEach(b => b.addEventListener('click', () => { PMETRIC = b.dataset.pmetric; renderPerson(); }));
+      document.querySelectorAll('.p-tf button[data-ptf]').forEach(b => b.addEventListener('click', () => { PTF = b.dataset.ptf; renderPerson(); }));
       document.querySelectorAll('.view-lens[data-vtarget] button[data-view]').forEach(b => b.addEventListener('click', () => {
         const t = b.closest('.view-lens').dataset.vtarget;
         VIEWS[t] = b.dataset.view;
