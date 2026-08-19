@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=39" />
+  <link rel="stylesheet" href="assets/styles.css?v=40" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-  <script src="assets/app.js?v=39" defer></script>
+  <script src="assets/app.js?v=40" defer></script>
 </head>
 <body>
   <!-- Standalone page: intentionally NOT linked from the main nav. Reachable by direct URL only. -->
@@ -59,6 +59,7 @@
           <div class="period-lens sec-lens" id="metric-lens"><button type="button" data-metric="briefs">Briefs</button><button type="button" data-metric="assets">Assets</button><button type="button" data-metric="hours">Hours</button><button type="button" data-metric="avg">Avg hrs/brief</button></div>
         </div>
       </div>
+      <p class="sec-desc">Total output each period. Use the metric switch to compare briefs, assets, hours, or average hours per brief over time.</p>
       <div class="chart-wrap"><canvas id="hlChart"></canvas></div>
       <p class="chart-note" id="hl-note"></p>
     </div></div>
@@ -66,6 +67,7 @@
     <!-- Efficiency -->
     <div class="band band-grey"><div class="wrap">
       <div class="section-head acc-orange"><h2>Efficiency</h2><div class="head-right"><div class="period-lens sec-lens" data-target="eff"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div></div></div>
+      <p class="sec-desc">Average hours spent per asset over time. A downward trend means each asset is taking less effort to produce.</p>
       <h4 class="chart-h">Hours per asset <span class="chart-sub">lower is better</span></h4>
       <div class="chart-wrap"><canvas id="hpaChart"></canvas></div>
     </div></div>
@@ -78,6 +80,7 @@
           <div class="period-lens sec-lens ot-split"><button type="button" data-split="overall">Overall</button><button type="button" data-split="brand">By brand</button><button type="button" data-split="chan">By department</button><button type="button" data-split="type">By asset type</button></div>
         </div>
       </div>
+      <p class="sec-desc">Share of jobs delivered on or before their due date. Split it out by brand, department or asset type to see where deadlines slip.</p>
       <div class="chart-wrap"><canvas id="otChart"></canvas></div>
       <p class="chart-note" id="ot-note"></p>
     </div></div>
@@ -85,24 +88,28 @@
     <!-- By brand -->
     <div class="band band-grey"><div class="wrap">
       <div class="section-head acc-orange"><h2>By brand</h2><div class="head-right" style="flex-direction:column;align-items:flex-end;gap:8px;"><div class="period-lens sec-lens" data-target="brand"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div><div class="period-lens sec-lens view-lens" data-vtarget="brand"><button type="button" data-view="stacked">Stacked</button><button type="button" data-view="lines">Lines</button><button type="button" data-view="share">Share</button></div></div></div>
+      <p class="sec-desc">How much work each brand takes each period — as absolute volume (stacked), each brand's own trend (lines), or share of the total.</p>
       <div class="chart-wrap"><canvas id="brandChart"></canvas></div>
     </div></div>
 
     <!-- By department -->
     <div class="band band-white"><div class="wrap">
       <div class="section-head acc-green"><h2>By department</h2><div class="head-right" style="flex-direction:column;align-items:flex-end;gap:8px;"><div class="period-lens sec-lens" data-target="chan"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div><div class="period-lens sec-lens view-lens" data-vtarget="chan"><button type="button" data-view="stacked">Stacked</button><button type="button" data-view="lines">Lines</button><button type="button" data-view="share">Share</button></div></div></div>
+      <p class="sec-desc">How hours are distributed across departments each period. Multi-department briefs split evenly.</p>
       <div class="chart-wrap"><canvas id="chanChart"></canvas></div>
     </div></div>
 
     <!-- By asset type -->
     <div class="band band-grey"><div class="wrap">
       <div class="section-head acc-rose"><h2>By asset type</h2><div class="head-right" style="flex-direction:column;align-items:flex-end;gap:8px;"><div class="period-lens sec-lens" data-target="type"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div><div class="period-lens sec-lens view-lens" data-vtarget="type"><button type="button" data-view="stacked">Stacked</button><button type="button" data-view="lines">Lines</button><button type="button" data-view="share">Share</button></div></div></div>
+      <p class="sec-desc">The mix of asset types produced each period — static, motion and the rest.</p>
       <div class="chart-wrap"><canvas id="typeChart"></canvas></div>
     </div></div>
 
     <!-- Work in progress (live health) -->
     <div class="band band-white"><div class="wrap">
       <div class="section-head acc-rose"><h2>Work in progress</h2><span class="meta">Live snapshot from Trello.</span></div>
+      <p class="sec-desc">What's on the go right now — the current backlog, anything overdue, and how live jobs are spread across the team.</p>
       <div class="grid grid-3">
         <div class="kpi"><div class="kpi-value" id="wip-prog">—</div><div class="kpi-label">In progress</div></div>
         <div class="kpi"><div class="kpi-value" id="wip-pend">—</div><div class="kpi-label">Pending</div></div>
