@@ -612,7 +612,8 @@ td.empty { text-align: center; color: var(--muted); padding: 30px; }
 .sec-lens button.active { background: var(--quantum-blue); color: #fff; }
 @media (max-width: 620px) { .section-head { flex-wrap: wrap; } .section-head .head-right { align-items: flex-start !important; } }
 
-.chart-wrap { position: relative; height: 360px; margin-top: 6px; }
+.chart-wrap { position: relative; height: 400px; margin-top: 6px; }
+.chart-wrap.tall { height: 480px; }
 .chart-note { margin-top: 14px; color: var(--muted); font-size: 0.88rem; }
 .sec-desc { color: var(--muted); font-size: 0.92rem; line-height: 1.55; max-width: 680px; margin: -6px 0 20px; }
 .chart-h { font-size: 0.98rem; font-weight: 800; color: var(--chrome-dark); margin: 0 0 8px; }
@@ -637,7 +638,7 @@ td.empty { text-align: center; color: var(--muted); padding: 30px; }
 .wl-track { flex: 1; height: 12px; background: var(--line); border-radius: 999px; overflow: hidden; }
 .wl-fill { height: 100%; background: var(--quantum-blue); border-radius: 999px; }
 .wl-num { width: 26px; text-align: right; font-weight: 700; color: var(--muted); font-size: 0.85rem; }
-@media (max-width: 620px) { .chart-wrap { height: 300px; } }
+@media (max-width: 620px) { .chart-wrap { height: 320px; } .chart-wrap.tall { height: 420px; } }
 
 footer { background: var(--chrome-dark); color: rgba(255,255,255,0.72); }
 .footer-inner { display: flex; align-items: center; justify-content: space-between; }

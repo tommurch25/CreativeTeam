@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=41" />
+  <link rel="stylesheet" href="assets/styles.css?v=43" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-  <script src="assets/app.js?v=41" defer></script>
+  <script src="assets/app.js?v=43" defer></script>
 </head>
 <body>
   <!-- Standalone page: intentionally NOT linked from the main nav. Reachable by direct URL only. -->
@@ -85,6 +85,21 @@
       <p class="chart-note" id="ot-note"></p>
     </div></div>
 
+    <!-- Studio cost -->
+    <div class="band band-grey"><div class="wrap">
+      <div class="section-head acc-orange"><h2>Studio cost</h2><div class="head-right"><div class="period-lens sec-lens" data-target="cost"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div></div></div>
+      <p class="sec-desc">Internal production cost — logged hours × a blended £27 per hour (salary and equipment). This is what work costs us to make, not client price or margin. KPIs compare the last complete period to the one before.</p>
+      <div class="grid grid-3">
+        <div class="kpi"><div class="kpi-value" id="cost-total">—</div><div class="kpi-label">Studio cost</div><div class="kpi-delta" id="costd-total"></div></div>
+        <div class="kpi"><div class="kpi-value" id="cost-brief">—</div><div class="kpi-label">Cost per brief</div><div class="kpi-delta" id="costd-brief"></div></div>
+        <div class="kpi"><div class="kpi-value" id="cost-asset">—</div><div class="kpi-label">Cost per asset</div><div class="kpi-delta" id="costd-asset"></div></div>
+      </div>
+      <h4 class="chart-h" style="margin-top:34px;">Cost over time</h4>
+      <div class="chart-wrap"><canvas id="costTrendChart"></canvas></div>
+      <h4 class="chart-h" style="margin-top:34px;">Cost by brand <span class="chart-sub">across the periods shown</span></h4>
+      <div class="chart-wrap tall"><canvas id="costBrandChart"></canvas></div>
+    </div></div>
+
     <!-- By brand -->
     <div class="band band-grey"><div class="wrap">
       <div class="section-head acc-orange"><h2>By brand</h2><div class="head-right" style="flex-direction:column;align-items:flex-end;gap:8px;"><div class="period-lens sec-lens" data-target="brand"><button type="button" data-lens="week">Week</button><button type="button" data-lens="month">Month</button><button type="button" data-lens="quarter">Quarter</button><button type="button" data-lens="fy">FY</button></div><div class="period-lens sec-lens view-lens" data-vtarget="brand"><button type="button" data-view="stacked">Stacked</button><button type="button" data-view="lines">Lines</button><button type="button" data-view="share">Share</button></div></div></div>
@@ -115,7 +130,7 @@
         </div>
       </div>
       <p class="sec-desc">How team members compare on delivery and production, from Trello card members. Work on shared cards is split evenly, and people with few jobs in the window will read as noisier — check the sample sizes below the chart.</p>
-      <div class="chart-wrap"><canvas id="personChart"></canvas></div>
+      <div class="chart-wrap tall"><canvas id="personChart"></canvas></div>
       <p class="chart-note" id="person-note"></p>
     </div></div>
 
@@ -164,8 +179,9 @@
 
   <script>
     const DATA_URL = 'https://script.google.com/macros/s/AKfycbz10YPP7Fk9U_Y-WXpAuRXsvrBU4mWvNlfU9jXVY1pB2g8e9Y2pVlc7gZLv8E5Y5FtWXQ/exec';
+    const RATE = 27;   // blended studio cost per hour (salary + equipment) — edit to change all cost figures
 
-    let ROWS = [], INPROGRESS = [], META = {}, METRIC = 'briefs', CHARTS = {}, LISTS = {}, LENSES = { hl: 'month', eff: 'month', ontime: 'month', brand: 'month', chan: 'month', type: 'month' }, VIEWS = { brand: 'stacked', chan: 'stacked', type: 'stacked' }, OTSPLIT = 'overall', PMETRIC = 'eff', PTF = 'all';
+    let ROWS = [], INPROGRESS = [], META = {}, METRIC = 'briefs', CHARTS = {}, LISTS = {}, LENSES = { hl: 'month', eff: 'month', ontime: 'month', cost: 'month', brand: 'month', chan: 'month', type: 'month' }, VIEWS = { brand: 'stacked', chan: 'stacked', type: 'stacked' }, OTSPLIT = 'overall', PMETRIC = 'eff', PTF = 'all';
     const SHOW = { week: 12, month: 12, quarter: 8, fy: 6 };
     const PALETTE = ['#0086ff', '#f42ca4', '#ff7900', '#12923a', '#7a17d1', '#143b76', '#00c19d', '#e0301e', '#b35c00', '#8b8f92'];
 
@@ -235,6 +251,7 @@
 
     const BASE_OPTS = {
       responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 8, right: 12, bottom: 2, left: 2 } },
       plugins: { legend: { labels: { font: { family: 'Proxima Nova' }, boxWidth: 12, padding: 12 } }, tooltip: { titleFont: { family: 'Proxima Nova' }, bodyFont: { family: 'Proxima Nova' } } },
       scales: { x: { grid: { display: false }, ticks: { font: { family: 'Proxima Nova' } } }, y: { beginAtZero: true, ticks: { font: { family: 'Proxima Nova' } }, grid: { color: '#eef0f2' } } }
     };
@@ -350,6 +367,59 @@
       draw('otChart', { type: 'line', data: { labels, datasets: datasets }, options: otOpts(true) });
     }
 
+    // ---- Studio cost (logged hours × RATE) ----
+    function costDelta(id, cur, prev, inverseGood) {
+      const el = document.getElementById(id); if (!el) return;
+      if (prev == null || !isFinite(cur)) { el.textContent = ''; el.className = 'kpi-delta'; return; }
+      const d = prev ? Math.round((cur - prev) / prev * 100) : (cur ? 100 : 0);
+      const arrow = d > 0 ? '▲' : d < 0 ? '▼' : '–', sign = d > 0 ? '+' : '';
+      const cls = inverseGood ? (d === 0 ? 'flat' : (d < 0 ? 'up' : 'down')) : 'flat';
+      el.className = 'kpi-delta ' + cls;
+      el.innerHTML = arrow + ' ' + sign + d + '% <span class="kpi-delta-ref">vs prev</span>';
+    }
+    function renderCost() {
+      const full = LISTS[LENSES.cost] || [];
+      const periods = full.slice(-SHOW[LENSES.cost]);
+      const labels = periods.map(p => p.label);
+      setLensActive('cost');
+      const gbp = v => '£' + Math.round(v).toLocaleString();
+      const gbpAxis = v => '£' + Number(v).toLocaleString();
+
+      const trend = periods.map(periodMetrics).map(s => Math.round(s.hours * RATE));
+      draw('costTrendChart', {
+        type: 'bar',
+        data: { labels, datasets: [
+          { type: 'bar', label: 'Studio cost', data: trend, backgroundColor: 'rgba(0,134,255,0.16)', borderColor: '#0086ff', borderWidth: 1, borderRadius: 4, order: 2 },
+          { type: 'line', label: 'Trend', data: trend, borderColor: '#0086ff', backgroundColor: '#0086ff', tension: 0.35, pointRadius: 3, borderWidth: 2.5, order: 1 }
+        ] },
+        options: Object.assign({}, BASE_OPTS, { plugins: Object.assign({}, BASE_OPTS.plugins, { legend: { display: false } }), scales: { x: BASE_OPTS.scales.x, y: Object.assign({}, BASE_OPTS.scales.y, { ticks: { callback: gbpAxis, font: { family: 'Proxima Nova' } } }) } })
+      });
+
+      const cur = full.length >= 2 ? periodMetrics(full[full.length - 2]) : null;
+      const prev = full.length >= 3 ? periodMetrics(full[full.length - 3]) : null;
+      const setT = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+      if (cur) {
+        const tc = cur.hours * RATE, cb = cur.briefs ? tc / cur.briefs : 0, ca = cur.assets ? tc / cur.assets : 0;
+        setT('cost-total', gbp(tc)); setT('cost-brief', gbp(cb)); setT('cost-asset', gbp(ca));
+        if (prev) {
+          const ptc = prev.hours * RATE, pcb = prev.briefs ? ptc / prev.briefs : 0, pca = prev.assets ? ptc / prev.assets : 0;
+          costDelta('costd-total', tc, ptc, false);
+          costDelta('costd-brief', cb, pcb, true);
+          costDelta('costd-asset', ca, pca, true);
+        } else { ['costd-total', 'costd-brief', 'costd-asset'].forEach(id => costDelta(id, 0, null)); }
+      }
+
+      const winS = periods.length ? periods[0].start : null, winE = periods.length ? periods[periods.length - 1].end : null;
+      const bh = {};
+      ROWS.forEach(j => { if (!inRange(j.deliveredISO, winS, winE)) return; const codes = [...new Set(brandCodes(j))]; if (!codes.length) return; const share = num(j.hours) / codes.length; codes.forEach(c => bh[c] = (bh[c] || 0) + share); });
+      const keys = Object.keys(bh).sort((a, b) => bh[b] - bh[a]).slice(0, 10);
+      draw('costBrandChart', {
+        type: 'bar',
+        data: { labels: keys, datasets: [{ label: 'Studio cost', data: keys.map(k => Math.round(bh[k] * RATE)), backgroundColor: keys.map((k, i) => (META[k] && META[k].colour) ? META[k].colour : PALETTE[i % PALETTE.length]), borderWidth: 0, borderRadius: 4 }] },
+        options: Object.assign({}, BASE_OPTS, { indexAxis: 'y', plugins: Object.assign({}, BASE_OPTS.plugins, { legend: { display: false } }), scales: { x: { beginAtZero: true, grid: { color: '#eef0f2' }, ticks: { callback: gbpAxis, font: { family: 'Proxima Nova' } } }, y: { grid: { display: false }, ticks: { font: { family: 'Proxima Nova' } } } } })
+      });
+    }
+
     // ---- By person (designer comparison via Trello card members) ----
     function personRange() {
       const now = new Date();
@@ -447,13 +517,13 @@
       document.getElementById('watch').innerHTML = r.watch.length ? r.watch.slice(0, 5).map(t => '<li>' + t + '</li>').join('') : '<li class="insight-empty">Nothing flagged — nice.</li>';
     }
 
-    function renderAll() { renderInsights(); renderHeadline(); renderEff(); renderOnTime(); renderBreakdown('brand'); renderBreakdown('chan'); renderBreakdown('type'); renderPerson(); renderWip(); }
+    function renderAll() { renderInsights(); renderHeadline(); renderEff(); renderOnTime(); renderCost(); renderBreakdown('brand'); renderBreakdown('chan'); renderBreakdown('type'); renderPerson(); renderWip(); }
 
     function wire() {
       document.querySelectorAll('.sec-lens[data-target] button[data-lens]').forEach(b => b.addEventListener('click', () => {
         const target = b.closest('.sec-lens').dataset.target;
         LENSES[target] = b.dataset.lens;
-        if (target === 'hl') renderHeadline(); else if (target === 'eff') renderEff(); else if (target === 'ontime') renderOnTime(); else renderBreakdown(target);
+        if (target === 'hl') renderHeadline(); else if (target === 'eff') renderEff(); else if (target === 'ontime') renderOnTime(); else if (target === 'cost') renderCost(); else renderBreakdown(target);
       }));
       document.querySelectorAll('.ot-split button[data-split]').forEach(b => b.addEventListener('click', () => { OTSPLIT = b.dataset.split; renderOnTime(); }));
       document.querySelectorAll('.p-metric button[data-pmetric]').forEach(b => b.addEventListener('click', () => { PMETRIC = b.dataset.pmetric; renderPerson(); }));
