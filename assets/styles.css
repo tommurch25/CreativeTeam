@@ -19,6 +19,7 @@
 @font-face { font-family: 'Proxima Nova'; src: url('fonts/ProximaNova-Extrabold.woff2') format('woff2'); font-weight: 800; font-display: swap; }
 
 :root {
+  color-scheme: light;   /* brand is a fixed light theme — stop browsers/OS auto-inverting it */
   --quantum-blue: #0086ff;
   --quantum-blue-80: #339ef2;
   --quantum-blue-40: #99ceee;

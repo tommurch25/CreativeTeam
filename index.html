@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
   <title>Creative Hub — Quantum</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=32" />
-  <script src="assets/app.js?v=32" defer></script>
+  <link rel="stylesheet" href="assets/styles.css?v=44" />
+  <script src="assets/app.js?v=44" defer></script>
 </head>
 <body>
   <!-- ===== Top nav (same on every page) ===== -->
@@ -77,10 +78,36 @@
     </div></div>
 
     <div class="band band-grey"><div class="wrap">
+    <!-- ===== What's new? =====
+      Each card: image + title + description + CTA. To add a cover image, drop it in assets/whatsnew/
+      and add  <img class="rc-img" src="assets/whatsnew/your-image.jpg" alt="" />  as the first child of .res-cover.
+      Set the card's href to where the CTA should go. Swap tone-* (rose / orange / green / purple) for the placeholder colour.
+    -->
+    <div class="section-head acc-green"><h2>What's new?</h2><span class="meta">Latest from the studio</span></div>
+    <div class="res-grid">
+      <a class="res-card" href="#">
+        <div class="res-cover"><img class="rc-img" src="assets/whatsnew/bynder.jpg" alt="Bynder" /></div>
+        <div class="res-body"><div class="res-title">Coming soon — Bynder</div><div class="res-desc">We're adding a DAM (digital asset management) tool to the stack. Bynder will store every asset we produce and let stakeholders search and find them in seconds. Watch this space.</div><span class="res-cta">Coming soon</span></div>
+      </a>
+      <a class="res-card" href="https://fliphtml5.com/bookcase/rgzyz/" target="_blank" rel="noopener">
+        <div class="res-cover"><img class="rc-img" src="assets/resources/all-guidelines.png" alt="All brand guidelines library" /></div>
+        <div class="res-body"><div class="res-title">Looking for guidelines?</div><div class="res-desc">All our brand guidelines now live in one hub library. Take a minute to get familiar with our corporate and portfolio brands.</div><span class="res-cta">Open the library ↗</span></div>
+      </a>
+      <a class="res-card" href="CaseStudy-BonusBurnout.html" target="_blank" rel="noopener">
+        <div class="res-cover"><img class="rc-img" src="assets/showcase/bonus-burnout.jpg" alt="Bonus Burnout mini-game" /></div>
+        <div class="res-body"><div class="res-title">Case study — Bonus Burnout</div><div class="res-desc">Our newest in-house interactive mini-game, built entirely in Bannerflow — one of many new games we can produce for any landing page you need.</div><span class="res-cta">Explore →</span></div>
+      </a>
+    </div>
+    </div></div>
+
+    <div class="band band-white"><div class="wrap">
     <!-- ===== At a glance ===== -->
     <div class="section-head acc-orange"><h2>At a glance</h2><span class="meta" id="glance-meta"></span></div>
     <div class="grid grid-4" id="glance">
       <div class="card stat"><div class="stat-value">…</div><div class="stat-label">Loading</div></div>
+    </div>
+    <div style="text-align:center;margin-top:28px;">
+      <a class="btn btn-primary" href="data.html">Explore studio data →</a>
     </div>
     </div></div>
   </main>
@@ -109,7 +136,7 @@
     </div>
     <div class="wrap footer-bar">
       <span>Quantum Creative Hub</span>
-      <span>Internal use only · V1.02</span>
+      <span>Internal use only · V1.03</span>
     </div>
   </footer>
 
