@@ -6,8 +6,8 @@
   <meta name="color-scheme" content="light" />
   <title>Jobs — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=44" />
-  <script src="assets/app.js?v=44" defer></script>
+  <link rel="stylesheet" href="assets/styles.css?v=48" />
+  <script src="assets/app.js?v=48" defer></script>
 </head>
 <body>
   <nav class="nav">
@@ -334,6 +334,9 @@
       makeDropdown('ms-type', 'Asset type', 'type');
       document.getElementById('f-search').addEventListener('input', e => { F.q = e.target.value.trim().toLowerCase(); renderDelivered(); });
       document.getElementById('f-date').addEventListener('change', e => { F.date = e.target.value; renderDelivered(); });
+      // Deep link: ?q= prefills the delivered search (used by the site-wide helper).
+      const qp = new URLSearchParams(location.search).get('q');
+      if (qp) { const box = document.getElementById('f-search'); box.value = qp; F.q = qp.trim().toLowerCase(); box.scrollIntoView({ block: 'center' }); }
       renderDelivered();
     }
     load();

@@ -615,6 +615,28 @@ td.empty { text-align: center; color: var(--muted); padding: 30px; }
 
 .chart-wrap { position: relative; height: 400px; margin-top: 6px; }
 .chart-wrap.tall { height: 480px; }
+
+/* FY report: quarter strip */
+.qstrip { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-top: 6px; }
+.qcard { position: relative; background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 20px; border-top: 3px solid var(--quantum-blue); box-shadow: 0 1px 2px rgba(61,68,73,0.04); }
+.qcard.active { border-top-color: var(--qubit-rose); }
+.qcard.empty { opacity: 0.6; }
+.qid { font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; color: var(--chrome-dark); }
+.qmo { color: var(--muted); font-size: 0.82rem; font-weight: 600; margin-top: 2px; }
+.qh { font-family: var(--font-display); font-weight: 800; font-size: 2rem; color: var(--quantum-blue); margin-top: 12px; line-height: 1; }
+.qhl { color: var(--muted); font-size: 0.8rem; font-weight: 600; margin-top: 4px; }
+.qbadge { position: absolute; top: 12px; right: 12px; font-size: 0.68rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+.qbadge.partial { background: #fff3e0; color: #b35c00; }
+.qbadge.none { background: var(--canvas-alt); color: var(--muted); }
+@media (max-width: 720px) { .qstrip { grid-template-columns: 1fr 1fr; } }
+
+/* FY report: what moved */
+.tk { display: flex; gap: 14px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--line); }
+.tk:first-child { border-top: none; }
+.tk .badge { flex: none; font-weight: 800; font-size: 0.8rem; padding: 5px 10px; border-radius: 999px; white-space: nowrap; }
+.tk .badge.up { background: #eaf6ee; color: #12923a; }
+.tk .badge.dn { background: #fdecec; color: #c0392b; }
+.tk .txt { font-size: 0.95rem; color: var(--chrome-dark); line-height: 1.5; }
 .chart-note { margin-top: 14px; color: var(--muted); font-size: 0.88rem; }
 .sec-desc { color: var(--muted); font-size: 0.92rem; line-height: 1.55; max-width: 680px; margin: -6px 0 20px; }
 .chart-h { font-size: 0.98rem; font-weight: 800; color: var(--chrome-dark); margin: 0 0 8px; }
@@ -668,4 +690,116 @@ footer { background: var(--chrome-dark); color: rgba(255,255,255,0.72); }
   .footer-inner { flex-direction: column; gap: 8px; text-align: center; }
   .footer-grid { grid-template-columns: 1fr; gap: 28px; padding: 36px 0 24px; }
   .footer-bar { flex-direction: column; gap: 8px; text-align: center; }
+}
+
+/* ============================================================
+   Smart helper — floating find-a-job / find-a-link assistant.
+   Injected site-wide by assets/app.js. Everything scoped to .qh-*.
+   ============================================================ */
+.qh { position: fixed; right: 22px; bottom: 22px; z-index: 90; font-family: var(--font-body); }
+.qh * { box-sizing: border-box; }
+
+/* Launcher button (drop a character image at assets/helper/assistant.png to replace the icon) */
+.qh-launch {
+  width: 62px; height: 62px; border-radius: 50%; border: none; cursor: pointer;
+  background: var(--quantum-blue); color: var(--white);
+  box-shadow: 0 8px 24px rgba(0,134,255,0.32), 0 2px 6px rgba(61,68,73,0.18);
+  display: flex; align-items: center; justify-content: center; padding: 0; overflow: hidden;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.qh-launch:hover { transform: translateY(-2px) scale(1.04); box-shadow: 0 12px 30px rgba(0,134,255,0.4); }
+.qh-launch:active { transform: scale(0.97); }
+.qh-launch svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.qh-launch img { width: 100%; height: 100%; object-fit: cover; }
+.qh-launch .qh-close-i { display: none; }
+.qh.open .qh-launch .qh-open-i { display: none; }
+.qh.open .qh-launch .qh-close-i { display: block; }
+
+/* Mascot mode: character shown whole (arms/legs), no circle, transparent. */
+.qh-launch.has-mascot { width: 94px; height: 94px; background: transparent; box-shadow: none; overflow: visible; }
+.qh-launch.has-mascot:hover { transform: translateY(-3px) scale(1.05); box-shadow: none; }
+.qh-launch.has-mascot::after { display: none; }
+.qh-launch.has-mascot .qh-open-i, .qh-launch.has-mascot .qh-close-i { display: none; }
+.qh-launch.has-mascot img { object-fit: contain; filter: drop-shadow(0 7px 9px rgba(61,68,73,0.28)); }
+.qh:not(.seen) .qh-launch.has-mascot img { animation: qhBob 2.2s ease-in-out infinite; transform-origin: bottom center; }
+@keyframes qhBob { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-5px) rotate(-2deg); } }
+/* gentle attention pulse until first opened */
+.qh-launch::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(0,134,255,0.45); animation: qhPulse 2.4s ease-out infinite;
+}
+.qh.open .qh-launch::after, .qh.seen .qh-launch::after { animation: none; }
+@keyframes qhPulse { 0% { box-shadow: 0 0 0 0 rgba(0,134,255,0.4); } 70% { box-shadow: 0 0 0 14px rgba(0,134,255,0); } 100% { box-shadow: 0 0 0 0 rgba(0,134,255,0); } }
+
+/* Nudge speech bubble */
+.qh-nudge {
+  position: absolute; right: 102px; bottom: 22px; width: max-content; max-width: 240px;
+  background: var(--white); color: var(--text); border: 1px solid var(--line);
+  border-radius: 14px; padding: 12px 34px 12px 14px; font-size: 0.9rem; font-weight: 600;
+  box-shadow: 0 10px 28px rgba(61,68,73,0.16); line-height: 1.4;
+  opacity: 0; transform: translateY(6px) scale(.96); transform-origin: bottom right;
+  pointer-events: none; transition: opacity .28s ease, transform .28s ease;
+}
+.qh-nudge.show { opacity: 1; transform: none; pointer-events: auto; }
+.qh-nudge::after { content: ''; position: absolute; right: -7px; bottom: 16px; width: 12px; height: 12px; background: var(--white); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); transform: rotate(-45deg); }
+.qh-nudge .qh-nudge-x { position: absolute; top: 6px; right: 8px; border: none; background: none; color: var(--chrome-dark-40); cursor: pointer; font-size: 1rem; line-height: 1; padding: 2px; }
+.qh-nudge .qh-nudge-x:hover { color: var(--text); }
+
+/* Panel */
+.qh-panel {
+  position: absolute; right: 0; bottom: 106px; width: 380px; max-width: calc(100vw - 32px);
+  background: var(--white); border: 1px solid var(--line); border-radius: 18px; overflow: hidden;
+  box-shadow: 0 24px 60px rgba(61,68,73,0.24), 0 4px 12px rgba(61,68,73,0.1);
+  display: none; flex-direction: column; max-height: min(620px, calc(100vh - 120px));
+}
+.qh.open .qh-panel { display: flex; animation: qhPop .22s cubic-bezier(.22,.61,.36,1); }
+@keyframes qhPop { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
+
+.qh-head { display: flex; align-items: center; gap: 12px; padding: 15px 16px 15px 20px; background: var(--quantum-blue); color: var(--white); }
+.qh-head .qh-htext { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.qh-head .qh-htitle { display: block; font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; letter-spacing: .01em; line-height: 1.15; }
+.qh-head .qh-hsub { display: block; font-size: 0.8rem; opacity: 0.9; margin-top: 2px; line-height: 1.2; }
+.qh-head .qh-x { border: none; background: rgba(255,255,255,0.16); color: var(--white); width: 30px; height: 30px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; line-height: 1; flex: none; transition: background .15s ease; }
+.qh-head .qh-x:hover { background: rgba(255,255,255,0.3); }
+
+.qh-body { padding: 14px 16px 6px; overflow-y: auto; flex: 1; }
+.qh-greet { font-size: 0.92rem; color: var(--muted); margin-bottom: 12px; }
+.qh-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+.qh-chip { border: 1px solid var(--line); background: var(--canvas-alt); color: var(--text); border-radius: 999px; padding: 7px 13px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: border-color .15s ease, background .15s ease, color .15s ease; }
+.qh-chip:hover { border-color: var(--quantum-blue); color: var(--quantum-blue); background: var(--quantum-blue-20); }
+
+.qh-group { margin-top: 14px; }
+.qh-group-t { text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.68rem; font-weight: 800; color: var(--muted); margin: 0 2px 8px; }
+.qh-res { display: flex; align-items: center; gap: 12px; padding: 10px 10px; border-radius: 12px; text-decoration: none; color: var(--text); transition: background .13s ease; cursor: pointer; }
+.qh-res:hover, .qh-res.active { background: var(--canvas-alt); }
+.qh-res .qh-ico { width: 34px; height: 34px; border-radius: 9px; flex: none; display: flex; align-items: center; justify-content: center; background: var(--quantum-blue-20); color: var(--quantum-blue); }
+.qh-res .qh-ico.job { background: var(--qubit-rose-20); color: var(--qubit-rose); }
+.qh-res .qh-ico svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.qh-res .qh-rtext { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+.qh-res .qh-rt { display: block; font-weight: 700; font-size: 0.9rem; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.qh-res .qh-rd { display: block; font-size: 0.79rem; color: var(--muted); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+.qh-res .qh-tag { align-self: center; flex: none; font-size: 0.64rem; font-weight: 800; letter-spacing: 0.03em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; background: var(--canvas-alt); color: var(--muted); border: 1px solid var(--line); white-space: nowrap; }
+.qh-res .qh-tag.live { background: var(--quantum-blue-20); color: var(--quantum-blue); border-color: transparent; }
+.qh-res .qh-tag.done { background: #e7f7ec; color: #12923a; border-color: transparent; }
+
+.qh-empty { text-align: center; color: var(--muted); font-size: 0.9rem; padding: 18px 8px 8px; }
+.qh-empty a { color: var(--quantum-blue); font-weight: 700; text-decoration: none; }
+.qh-note { color: var(--muted); font-size: 0.82rem; padding: 6px 4px; }
+
+.qh-foot { border-top: 1px solid var(--line); padding: 12px 16px; background: var(--white); }
+.qh-search { display: flex; align-items: center; gap: 9px; border: 1px solid var(--line); border-radius: 11px; padding: 0 12px; height: 44px; transition: border-color .15s ease, box-shadow .15s ease; }
+.qh-search:focus-within { border-color: var(--quantum-blue); box-shadow: 0 0 0 3px var(--quantum-blue-20); }
+.qh-search svg { width: 18px; height: 18px; fill: none; stroke: var(--chrome-dark-40); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.qh-search input { border: none; outline: none; flex: 1; font-family: var(--font-body); font-size: 0.92rem; color: var(--text); background: transparent; min-width: 0; }
+.qh-hint { text-align: center; font-size: 0.72rem; color: var(--chrome-dark-40); margin-top: 8px; }
+
+@media (max-width: 620px) {
+  .qh { right: 16px; bottom: 16px; }
+  .qh-panel { bottom: 100px; right: -4px; width: calc(100vw - 24px); }
+  .qh-nudge { max-width: 190px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .qh-launch::after { animation: none; }
+  .qh.open .qh-panel { animation: none; }
+  .qh-launch.has-mascot img { animation: none; }
 }
