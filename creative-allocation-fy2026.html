@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <title>The year in creative — Quantum</title>
+  <link rel="icon" href="assets/logos/favicon_master.svg" />
+  <link rel="stylesheet" href="assets/styles.css?v=49" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="assets/app.js?v=49" defer></script>
+</head>
+<body>
+  <!-- Standalone FY report: intentionally NOT linked from the main nav (like the Dashboard). Live from the tracker. -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html" aria-label="Quantum Creative Hub" style="display:flex;align-items:center;gap:12px;">
+        <img src="assets/logos/quantum_logo_master_blue.svg" alt="Quantum" />
+        <span style="color:var(--chrome-dark-40);">|</span>
+        <span style="font-weight:600;color:var(--muted);font-size:0.95rem;">Creative Hub</span>
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="index.html">Home</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="team.html">Team</a>
+        <a href="data.html">Data</a>
+        <a href="resources.html">Resources</a>
+        <a href="showcase.html">Showcase</a>
+        <a class="nav-cta" href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
+      </div>
+      <button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <main class="banded">
+    <div class="band band-grey"><div class="wrap">
+      <section class="hero compact">
+        <div class="eyebrow"><span class="dot"></span> <span id="fy-eyebrow">FY report</span></div>
+        <h1>The year in creative.</h1>
+        <p class="lead">How the studio's delivered work has split across the financial year — volume, brands, departments and where the hours landed. Live from the tracker.</p>
+        <p class="meta period-count" id="fy-meta">Loading…</p>
+      </section>
+    </div></div>
+
+    <!-- FY headline + quarters -->
+    <div class="band band-white"><div class="wrap">
+      <div class="section-head acc-rose"><h2>The year so far</h2><span class="meta" id="fy-sub"></span></div>
+      <div class="kpi-strip" id="fy-kpis">
+        <div class="kpi"><div class="kpi-value" id="fy-briefs">—</div><div class="kpi-label">Briefs delivered</div></div>
+        <div class="kpi"><div class="kpi-value" id="fy-assets">—</div><div class="kpi-label">Assets delivered</div></div>
+        <div class="kpi"><div class="kpi-value" id="fy-hours">—</div><div class="kpi-label">Hours logged</div></div>
+        <div class="kpi"><div class="kpi-value" id="fy-brands">—</div><div class="kpi-label">Active brands</div></div>
+      </div>
+      <h4 class="chart-h" style="margin-top:34px;">By quarter</h4>
+      <p class="sec-desc">Briefs delivered each quarter of the financial year (Oct–Sep). The current quarter is still in progress.</p>
+      <div class="qstrip" id="qstrip"></div>
+    </div></div>
+
+    <!-- Briefs over the year -->
+    <div class="band band-grey"><div class="wrap">
+      <div class="section-head acc-orange"><h2>What we were asked to make</h2></div>
+      <p class="sec-desc">Briefs delivered month by month across the financial year, with the trend line over the top.</p>
+      <div class="chart-wrap"><canvas id="monthChart"></canvas></div>
+      <p class="chart-note" id="month-note"></p>
+    </div></div>
+
+    <!-- By vertical (where the hours went) -->
+    <div class="band band-white"><div class="wrap">
+      <div class="section-head acc-green"><h2>How we split the year</h2></div>
+      <p class="sec-desc">Where the delivered hours landed across the verticals we serve. (Hours logged on delivered briefs — split evenly where a brief spans more than one brand.)</p>
+      <div class="chart-wrap tall"><canvas id="vertChart"></canvas></div>
+    </div></div>
+
+    <!-- By brand -->
+    <div class="band band-grey"><div class="wrap">
+      <div class="section-head acc-rose"><h2>Which brands pulled the work</h2></div>
+      <p class="sec-desc">Briefs delivered per brand across the year. Top brands shown.</p>
+      <div class="chart-wrap tall"><canvas id="brandChart"></canvas></div>
+    </div></div>
+
+    <!-- By department -->
+    <div class="band band-white"><div class="wrap">
+      <div class="section-head acc-orange"><h2>Where the work comes from</h2></div>
+      <p class="sec-desc">Briefs delivered by requesting department across the year.</p>
+      <div class="chart-wrap"><canvas id="deptChart"></canvas></div>
+    </div></div>
+
+    <!-- What moved -->
+    <div class="band band-grey"><div class="wrap">
+      <div class="section-head acc-green"><h2>What moved</h2><span class="meta" id="moved-sub"></span></div>
+      <p class="sec-desc">Biggest shifts in each vertical's share of hours, latest complete quarter versus the one before — generated from the tracker.</p>
+      <div id="moved"></div>
+    </div></div>
+  </main>
+
+  <footer>
+    <div class="wrap footer-grid">
+      <div class="foot-brand">
+        <img class="foot-logo" src="assets/logos/quantum_logo_white.svg" alt="Quantum" />
+        <p class="foot-tag">The creative team's hub — brief in work, follow jobs, and see how the studio is performing.</p>
+        <a class="foot-corp" href="https://www.quantum.media/" target="_blank" rel="noopener">quantum.media ↗</a>
+      </div>
+      <nav class="foot-nav" aria-label="Footer">
+        <div class="foot-col-title">Explore</div>
+        <a href="index.html">Home</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="team.html">Team</a>
+        <a href="data.html">Data</a>
+        <a href="resources.html">Resources</a>
+        <a href="showcase.html">Showcase</a>
+      </nav>
+      <div class="foot-actions">
+        <div class="foot-col-title">Get in touch</div>
+        <a class="foot-fb" href="https://slack.com/app_redirect?channel=U08KV5Q7B6W" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>Send feedback</a>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
+      </div>
+    </div>
+    <div class="wrap footer-bar">
+      <span>Quantum Creative Hub</span>
+      <span>Internal use only · V1.03</span>
+    </div>
+  </footer>
+
+  <script>
+    const DATA_URL = 'https://script.google.com/macros/s/AKfycbz10YPP7Fk9U_Y-WXpAuRXsvrBU4mWvNlfU9jXVY1pB2g8e9Y2pVlc7gZLv8E5Y5FtWXQ/exec';
+    let ROWS = [], META = {}, CHARTS = {};
+    const MSHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const PALETTE = ['#0086ff','#f42ca4','#ff7900','#12923a','#7a17d1','#143b76','#00c19d','#e0301e','#b35c00','#8b8f92'];
+    const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+    const cells = s => String(s || '').split(',').map(x => x.trim()).filter(Boolean);
+    const codeOf = s => { const i = s.indexOf(' - '); return (i > -1 ? s.slice(0, i) : s).trim(); };
+    const brandCodes = j => [...new Set(cells(j.brand).map(codeOf).map(c => c === 'CAS' ? 'CBK' : c))];
+    const pad2 = n => String(n).padStart(2, '0');
+    const iso = d => d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+    const inRange = (v, s, e) => (!s || v >= s) && (!e || v < e);
+    const round1 = v => Math.round(v * 10) / 10;
+
+    // FY runs Oct–Sep; FY label = end year. Current FY from today.
+    const now = new Date();
+    const FY = now.getMonth() >= 9 ? now.getFullYear() + 1 : now.getFullYear();
+    const fyStart = new Date(FY - 1, 9, 1);            // 1 Oct (prev year)
+    const fyEnd = new Date(FY, 9, 1);                  // 1 Oct (this FY end -> exclusive)
+    const Q = [
+      { id: 'Q1', months: 'Oct–Dec ' + (FY - 1), s: new Date(FY - 1, 9, 1), e: new Date(FY - 1, 12, 1) },
+      { id: 'Q2', months: 'Jan–Mar ' + FY, s: new Date(FY, 0, 1), e: new Date(FY, 3, 1) },
+      { id: 'Q3', months: 'Apr–Jun ' + FY, s: new Date(FY, 3, 1), e: new Date(FY, 6, 1) },
+      { id: 'Q4', months: 'Jul–Sep ' + FY, s: new Date(FY, 6, 1), e: new Date(FY, 9, 1) }
+    ];
+    const fyRows = () => ROWS.filter(j => inRange(j.deliveredISO, iso(fyStart), iso(fyEnd)));
+    const inQ = (j, q) => inRange(j.deliveredISO, iso(q.s), iso(q.e));
+    const qState = q => (now >= q.e ? 'complete' : (now >= q.s ? 'partial' : 'future'));
+
+    const BASE_OPTS = {
+      responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 8, right: 12, bottom: 2, left: 2 } },
+      plugins: { legend: { display: false }, tooltip: { titleFont: { family: 'Proxima Nova' }, bodyFont: { family: 'Proxima Nova' } } },
+      scales: { x: { grid: { display: false }, ticks: { font: { family: 'Proxima Nova' } } }, y: { beginAtZero: true, ticks: { font: { family: 'Proxima Nova' } }, grid: { color: '#eef0f2' } } }
+    };
+    const draw = (id, cfg) => { if (CHARTS[id]) CHARTS[id].destroy(); CHARTS[id] = new Chart(document.getElementById(id), cfg); };
+
+    // hours per vertical (split evenly across a brief's brands), for a set of rows
+    function vertHours(rows) {
+      const out = {};
+      rows.forEach(j => {
+        const codes = brandCodes(j); if (!codes.length) return;
+        const share = num(j.hours) / codes.length;
+        codes.forEach(c => { const v = (META[c] && META[c].vertical) ? META[c].vertical : 'Other'; out[v] = (out[v] || 0) + share; });
+      });
+      return out;
+    }
+    function countBy(rows, keyFn) {
+      const out = {};
+      rows.forEach(j => keyFn(j).forEach(k => out[k] = (out[k] || 0) + 1));
+      return out;
+    }
+    const topEntries = (obj, n) => Object.keys(obj).sort((a, b) => obj[b] - obj[a]).slice(0, n).map(k => [k, obj[k]]);
+
+    function renderHeadline() {
+      const rows = fyRows();
+      let assets = 0, hours = 0; const bset = new Set();
+      rows.forEach(j => { assets += num(j.assets); hours += num(j.hours); brandCodes(j).forEach(c => bset.add(c)); });
+      document.getElementById('fy-briefs').textContent = rows.length.toLocaleString();
+      document.getElementById('fy-assets').textContent = Math.round(assets).toLocaleString();
+      document.getElementById('fy-hours').textContent = Math.round(hours).toLocaleString();
+      document.getElementById('fy-brands').textContent = bset.size;
+      document.getElementById('fy-eyebrow').textContent = 'FY' + pad2(FY % 100) + ' report';
+      document.getElementById('fy-sub').textContent = 'FY' + pad2(FY % 100) + ' · Oct ' + (FY - 1) + ' – Sep ' + FY;
+      document.getElementById('fy-meta').textContent = rows.length + ' briefs delivered so far this financial year.';
+    }
+
+    function renderQuarters() {
+      const el = document.getElementById('qstrip'); el.innerHTML = '';
+      Q.forEach(q => {
+        const st = qState(q);
+        const n = fyRows().filter(j => inQ(j, q)).length;
+        const badge = st === 'complete' ? '' : (st === 'future' ? '<span class="qbadge none">No data yet</span>' : '<span class="qbadge partial">In progress</span>');
+        el.insertAdjacentHTML('beforeend',
+          '<div class="qcard ' + (st === 'partial' ? 'active' : '') + (st === 'future' ? ' empty' : '') + '">' + badge +
+          '<div class="qid">' + q.id + '</div><div class="qmo">' + q.months + '</div>' +
+          '<div class="qh">' + (st === 'future' ? '—' : n) + '</div><div class="qhl">Briefs</div></div>');
+      });
+    }
+
+    function renderMonths() {
+      const rows = fyRows();
+      const labels = [], vals = [];
+      for (let i = 0; i < 12; i++) {
+        const d = new Date(FY - 1, 9 + i, 1), nx = new Date(FY - 1, 10 + i, 1);
+        labels.push(MSHORT[d.getMonth()] + ' ' + pad2(d.getFullYear() % 100));
+        vals.push(rows.filter(j => inRange(j.deliveredISO, iso(d), iso(nx))).length);
+      }
+      draw('monthChart', { type: 'bar', data: { labels, datasets: [
+        { type: 'bar', label: 'Briefs', data: vals, backgroundColor: 'rgba(0,134,255,0.20)', borderColor: '#0086ff', borderWidth: 1, borderRadius: 4, order: 2 },
+        { type: 'line', label: 'Trend', data: vals, borderColor: '#0086ff', backgroundColor: '#0086ff', tension: 0.35, pointRadius: 3, borderWidth: 2.5, order: 1 }
+      ] }, options: BASE_OPTS });
+      const done = vals.filter(v => v > 0);
+      const busiestI = vals.indexOf(Math.max.apply(null, vals));
+      document.getElementById('month-note').textContent = done.length ? ('Busiest month: ' + labels[busiestI] + ' (' + vals[busiestI] + ' briefs). ' + rows.length + ' delivered across the year.') : '';
+    }
+
+    function hbar(id, entries, colourFn, fmt) {
+      const labels = entries.map(e => e[0]);
+      const data = entries.map(e => Math.round(e[1]));
+      draw(id, { type: 'bar', data: { labels, datasets: [{ data, backgroundColor: labels.map(colourFn), borderWidth: 0, borderRadius: 4 }] },
+        options: Object.assign({}, BASE_OPTS, { indexAxis: 'y', scales: { x: { beginAtZero: true, grid: { color: '#eef0f2' }, ticks: { callback: fmt || (v => v), font: { family: 'Proxima Nova' } } }, y: { grid: { display: false }, ticks: { font: { family: 'Proxima Nova' } } } } }) });
+    }
+
+    function renderVerticals() {
+      const vh = vertHours(fyRows());
+      const entries = topEntries(vh, 12);
+      hbar('vertChart', entries, (l, i) => PALETTE[i % PALETTE.length], v => v + 'h');
+    }
+    function renderBrands() {
+      const bc = countBy(fyRows(), brandCodes);
+      const entries = topEntries(bc, 10);
+      hbar('brandChart', entries, (l) => (META[l] && META[l].colour) ? META[l].colour : '#0086ff');
+    }
+    function renderDepts() {
+      const dc = countBy(fyRows(), j => cells(j.channel));
+      const entries = topEntries(dc, 10);
+      hbar('deptChart', entries, (l, i) => PALETTE[i % PALETTE.length]);
+    }
+
+    function renderMoved() {
+      // latest complete quarter vs the one before, by vertical share of hours
+      const complete = Q.filter(q => qState(q) === 'complete');
+      const el = document.getElementById('moved');
+      if (complete.length < 2) { el.innerHTML = '<p class="insight-empty">Not enough complete quarters yet to compare.</p>'; return; }
+      const cur = complete[complete.length - 1], prev = complete[complete.length - 2];
+      const curH = vertHours(ROWS.filter(j => inQ(j, cur))), prevH = vertHours(ROWS.filter(j => inQ(j, prev)));
+      const sum = o => Object.keys(o).reduce((s, k) => s + o[k], 0);
+      const curT = sum(curH) || 1, prevT = sum(prevH) || 1;
+      const keys = [...new Set(Object.keys(curH).concat(Object.keys(prevH)))];
+      const rows = keys.map(k => ({ k, d: (curH[k] || 0) / curT * 100 - (prevH[k] || 0) / prevT * 100 }))
+        .filter(r => Math.abs(r.d) >= 1).sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 6);
+      document.getElementById('moved-sub').textContent = cur.id + ' vs ' + prev.id;
+      el.innerHTML = rows.length ? rows.map(r => {
+        const up = r.d >= 0;
+        return '<div class="tk"><div class="badge ' + (up ? 'up' : 'dn') + '">' + (up ? '▲' : '▼') + ' ' + (up ? '+' : '') + round1(r.d) + ' pp</div>' +
+          '<div class="txt"><strong>' + r.k + '</strong> ' + (up ? 'grew' : 'eased') + ' as a share of hours, ' + cur.id + ' vs ' + prev.id + '.</div></div>';
+      }).join('') : '<p class="insight-empty">No material shifts between the last two quarters.</p>';
+    }
+
+    async function load() {
+      try { const r = await fetch(DATA_URL, { cache: 'no-store' }); const d = await r.json(); ROWS = (d.delivered || []).filter(j => j.deliveredISO); META = d.brandMeta || {}; }
+      catch (e) { document.getElementById('fy-meta').textContent = 'Could not load the tracker feed.'; return; }
+      renderHeadline(); renderQuarters(); renderMonths(); renderVerticals(); renderBrands(); renderDepts(); renderMoved();
+    }
+    load();
+  </script>
+</body>
+</html>
