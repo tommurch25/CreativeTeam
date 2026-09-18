@@ -6,8 +6,8 @@
   <meta name="color-scheme" content="light" />
   <title>Creative Hub — Quantum</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=49" />
-  <script src="assets/app.js?v=49" defer></script>
+  <link rel="stylesheet" href="assets/styles.css?v=56" />
+  <script src="assets/app.js?v=56" defer></script>
 </head>
 <body>
   <!-- ===== Top nav (same on every page) ===== -->
@@ -25,6 +25,7 @@
         <a href="data.html">Data</a>
         <a href="resources.html">Resources</a>
         <a href="showcase.html">Showcase</a>
+        <a class="nav-cta nav-cta-blue" href="https://solis.bynder.com/" target="_blank" rel="noopener">Solis ↗</a>
         <a class="nav-cta" href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
       </div>
       <button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
@@ -33,15 +34,42 @@
 
   <main class="banded">
     <div class="band band-grey"><div class="wrap">
-    <!-- ===== Hero — Master Blue field, Blue leads ===== -->
-    <section class="hero">
+    <!-- ===== Hero carousel — 3 auto-rotating slides. Edit copy/links inside each .hero-slide. ===== -->
+    <section class="hero hero-carousel" aria-roledescription="carousel" aria-label="Creative Hub highlights">
       <img class="hero-mark" src="assets/logos/favicon_master.svg" alt="" aria-hidden="true" />
-      <div class="eyebrow"><span class="dot"></span> Creative Hub</div>
-      <h1>Welcome to the Quantum Creative Hub, your one stop shop for all things creative!</h1>
-      <p class="lead">Brief in new work, follow jobs, and see how the studio is performing.</p>
-      <div class="btn-row">
-        <a class="btn btn-rose" href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
-        <a class="btn btn-ghost-blue" href="data.html">See studio data</a>
+      <div class="hero-slides">
+        <div class="hero-slide is-active" role="group" aria-roledescription="slide" aria-label="1 of 3" data-mark="assets/logos/favicon_master.svg">
+          <div class="eyebrow"><span class="dot"></span> Creative Hub</div>
+          <h1>Welcome to the Quantum Creative Hub, your one stop shop for all things creative!</h1>
+          <p class="lead">Brief in new work, follow jobs, and see how the studio is performing.</p>
+          <div class="btn-row">
+            <a class="btn btn-rose" href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
+            <a class="btn btn-ghost-blue" href="data.html">See studio data</a>
+          </div>
+        </div>
+        <div class="hero-slide" role="group" aria-roledescription="slide" aria-label="2 of 3" data-mark="assets/logos/solis-icon.png">
+          <div class="eyebrow"><span class="dot"></span> Solis</div>
+          <h1>Every asset. Every brand. One source of truth.</h1>
+          <p class="lead">Solis is our digital asset manager — find and share everything the studio produces, in seconds.</p>
+          <div class="btn-row">
+            <a class="btn btn-rose" href="https://solis.bynder.com/" target="_blank" rel="noopener">Open Solis ↗</a>
+            <a class="btn btn-ghost-blue" href="Solis-Showcase.html" target="_blank" rel="noopener">Showcase</a>
+          </div>
+        </div>
+        <div class="hero-slide" role="group" aria-roledescription="slide" aria-label="3 of 3" data-mark="assets/logos/prism-icon.png">
+          <div class="eyebrow"><span class="dot"></span> Prism</div>
+          <h1>Prism — clarity for your naming creative.</h1>
+          <p class="lead">Our naming tool: one place to keep names consistent and get creative live, faster.</p>
+          <div class="btn-row">
+            <a class="btn btn-rose" href="https://prism.marketing.qih-tech.com/" target="_blank" rel="noopener">Open Prism ↗</a>
+            <a class="btn btn-ghost-blue" href="resources.html">More tools</a>
+          </div>
+        </div>
+      </div>
+      <div class="hero-dots" role="tablist" aria-label="Choose slide">
+        <button class="hero-dot is-active" type="button" role="tab" aria-selected="true" aria-label="Show slide 1"></button>
+        <button class="hero-dot" type="button" role="tab" aria-selected="false" aria-label="Show slide 2"></button>
+        <button class="hero-dot" type="button" role="tab" aria-selected="false" aria-label="Show slide 3"></button>
       </div>
     </section>
     </div></div>
@@ -136,7 +164,7 @@
     </div>
     <div class="wrap footer-bar">
       <span>Quantum Creative Hub</span>
-      <span>Internal use only · V1.03</span>
+      <span>Internal use only · V1.04</span>
     </div>
   </footer>
 
@@ -255,6 +283,38 @@
       document.getElementById('glance-meta').textContent = s.lastMonthLabel ? 'Last month: ' + s.lastMonthLabel : '';
     }
     loadGlance();
+  </script>
+
+  <script>
+    /* Hero carousel: the active dot's fill bar counts down the slide; its completion
+       advances to the next slide, so bar + slide stay in sync. Pauses on hover/focus
+       via CSS. Reduced-motion: no auto-advance, dots act as manual controls. */
+    (function () {
+      var root = document.querySelector('.hero-carousel');
+      if (!root) return;
+      var slides = [].slice.call(root.querySelectorAll('.hero-slide'));
+      var dots = [].slice.call(root.querySelectorAll('.hero-dot'));
+      if (slides.length < 2) return;
+      var mark = root.querySelector('.hero-mark');
+      var i = 0, DUR = 6000;
+      root.style.setProperty('--qh-dur', DUR + 'ms');
+      dots.forEach(function (d, k) {
+        var fill = document.createElement('span');
+        fill.className = 'hero-dot-fill';
+        d.appendChild(fill);
+        fill.addEventListener('animationend', function () { if (k === i) go(i + 1); });
+        d.addEventListener('click', function () { go(k); });
+      });
+      function go(n) {
+        i = (n + slides.length) % slides.length;
+        root.setAttribute('data-active', i);
+        var mk = slides[i].getAttribute('data-mark');
+        if (mark && mk) mark.setAttribute('src', mk);
+        slides.forEach(function (s, k) { s.classList.toggle('is-active', k === i); s.inert = (k !== i); });
+        dots.forEach(function (d, k) { d.classList.toggle('is-active', k === i); d.setAttribute('aria-selected', k === i ? 'true' : 'false'); });
+      }
+      go(0);
+    })();
   </script>
 </body>
 </html>
