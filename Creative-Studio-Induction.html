@@ -409,8 +409,8 @@ var dec=(numStr.split('.')[1]||'').length, target=parseFloat(numStr.replace(/,/g
 var t0=null, dur=1300;
 function fmt(v){return prefix+v.toLocaleString(undefined,{minimumFractionDigits:dec,maximumFractionDigits:dec})+suffix;}
 el.textContent=fmt(0);
-function step(t){if(!t0)t0=t;var k=Math.min((t-t0)/dur,1);k=1-Math.pow(1-k,3);el.textContent=fmt(target*k);if(k<1)requestAnimationFrame(step);else el.textContent=text;}
-requestAnimationFrame(step);
+function step(t){if(!t0)t0=t;var k=Math.min((t-t0)/dur,1);k=1-Math.pow(1-k,3);el.textContent=fmt(target*k);if(k<1){el._raf=requestAnimationFrame(step);}else{el.textContent=text;el._raf=null;}}
+el._raf=requestAnimationFrame(step);
 }
 var KPI_CONFIG = {
 url: 'https://script.google.com/macros/s/AKfycbz10YPP7Fk9U_Y-WXpAuRXsvrBU4mWvNlfU9jXVY1pB2g8e9Y2pVlc7gZLv8E5Y5FtWXQ/exec'
@@ -471,9 +471,14 @@ aph: hours>0 ? assets/hours : 0, brands:Object.keys(brands).length};
 function fmt(n,dec){ return Number(n).toLocaleString(undefined,{minimumFractionDigits:dec||0,maximumFractionDigits:dec||0}); }
 function setKPI(key,text){
 var el=document.querySelector('.kpi [data-kpi="'+key+'"]'); if(!el) return;
-el.dataset.final=text;
-if(el.dataset.done) el.textContent=text;   // already animated -> update in place
-else el.textContent=text;                  // seeds the value the count-up will animate to
+el.dataset.final=text;                        // live value is always authoritative
+if(el.dataset.done){                          // count-up already ran/running -> cancel & re-animate to live
+  if(el._raf){cancelAnimationFrame(el._raf); el._raf=null;}
+  el.dataset.done='';
+  if(document.documentElement.classList.contains('anim')) runCnt(el); else el.textContent=text;
+}else{
+  el.textContent=text;                        // not revealed yet; seed live (runCnt will use dataset.final on reveal)
+}
 }
 function applyKPIs(k){
 setKPI('briefs', fmt(k.briefs));
