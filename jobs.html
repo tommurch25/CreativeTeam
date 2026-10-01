@@ -6,8 +6,8 @@
   <meta name="color-scheme" content="light" />
   <title>Jobs — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=57" />
-  <script src="assets/app.js?v=57" defer></script>
+  <link rel="stylesheet" href="assets/styles.css?v=58" />
+  <script src="assets/app.js?v=58" defer></script>
 </head>
 <body>
   <nav class="nav">
@@ -64,10 +64,10 @@
     </div></div>
 
     <!-- By stakeholder (live briefs) -->
-    <div class="band band-grey" id="stake-band" style="display:none;"><div class="wrap">
+    <div class="band band-grey" id="stake-band"><div class="wrap">
       <div class="section-head"><h2>By stakeholder</h2><span class="meta" id="stake-count"></span></div>
       <p style="margin:-4px 0 18px;color:var(--muted);font-size:0.9rem;">Live briefs grouped by who they're for (from each card's "Project From"). Click a brief to open its Trello card.</p>
-      <div class="grid grid-3" id="stake-grid"></div>
+      <div class="grid grid-3" id="stake-grid"><div class="hl-loading">Loading</div></div>
     </div></div>
 
     <div class="band band-white"><div class="wrap">
@@ -241,22 +241,26 @@
 
     // ----- By stakeholder (live briefs) -----
     function renderStakeholders() {
-      const band = document.getElementById('stake-band'), grid = document.getElementById('stake-grid');
-      if (!band || !grid) return;
+      const grid = document.getElementById('stake-grid');
+      if (!grid) return;
       const groups = {};
       INPROGRESS.forEach(j => { const s = (j.stakeholder || '').trim(); if (!s) return; (groups[s] = groups[s] || []).push(j); });
       const names = Object.keys(groups).sort((a, b) => groups[b].length - groups[a].length || a.localeCompare(b));
-      if (!names.length) { band.style.display = 'none'; return; }  // nothing to show yet (feed not updated)
-      band.style.display = '';
       const total = names.reduce((n, k) => n + groups[k].length, 0);
-      document.getElementById('stake-count').textContent = names.length + ' stakeholder' + (names.length > 1 ? 's' : '') + ' · ' + total + ' live brief' + (total > 1 ? 's' : '');
+      document.getElementById('stake-count').textContent = names.length ? (names.length + ' stakeholder' + (names.length > 1 ? 's' : '') + ' · ' + total + ' live brief' + (total > 1 ? 's' : '')) : '';
+      if (!names.length) { grid.innerHTML = '<p class="team-empty">No live briefs with a stakeholder yet.</p>'; return; }
       grid.innerHTML = names.map(n => {
         const jobs = groups[n].slice().sort((a, b) => numJN(a.jobNumber) - numJN(b.jobNumber));
         const rows = jobs.map(j => {
           const label = esc((j.jobNumber ? j.jobNumber + ' · ' : '') + (j.title || 'Untitled'));
+          const sub = j.submitted ? 'Submitted ' + esc(j.submitted) : '';
+          const dueTxt = j.due ? 'Due ' + esc(j.due) : 'No due date';
+          const dueSpan = j.status === 'Overdue' ? `<span class="od">${dueTxt}</span>` : dueTxt;
+          const meta = `<span class="stk-meta">${sub}${sub ? ' · ' : ''}${dueSpan}</span>`;
+          const inner = `<span class="stk-main">${label} ${EXT}</span>${meta}`;
           return j.trelloUrl
-            ? `<a class="tj-row" href="${j.trelloUrl}" target="_blank" rel="noopener">${label} ${EXT}</a>`
-            : `<div class="tj-row">${label}</div>`;
+            ? `<a class="tj-row stk-row" href="${j.trelloUrl}" target="_blank" rel="noopener">${inner}</a>`
+            : `<div class="tj-row stk-row">${inner}</div>`;
         }).join('');
         return `<div class="team-card"><div class="team-head"><div class="tinfo"><div class="team-name">${esc(n)}</div><div class="team-role">${jobs.length} live brief${jobs.length > 1 ? 's' : ''}</div></div><span class="team-count">${jobs.length}</span></div><div class="team-jobs">${rows}</div></div>`;
       }).join('');
