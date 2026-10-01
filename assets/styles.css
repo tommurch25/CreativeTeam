@@ -396,6 +396,9 @@ main.banded { padding: 0; }
 .tj-title { color: var(--chrome-dark); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tj-over { color: #e0301e; font-weight: 700; font-size: 0.72rem; }
 .team-empty { color: var(--muted); font-size: 0.85rem; }
+.team-jobs a.tj-row { color: var(--text); text-decoration: none; transition: color .15s ease; }
+.team-jobs a.tj-row:hover { color: var(--quantum-blue); }
+.team-jobs a.tj-row svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; opacity: 0.55; flex: none; }
 
 /* resources: image-led link cards */
 .res-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
