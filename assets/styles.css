@@ -415,6 +415,11 @@ main.banded { padding: 0; }
 .res-cover.tone-purple { background: #7a17d1; }
 .res-cover .rc-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .res-cover .rc-mark { position: absolute; right: -14px; bottom: -20px; width: 120px; height: 120px; opacity: 0.16; }
+/* Quantum Lens brand lockup (real logo + brand font), in place of a cover image */
+.res-cover.lens-cover { gap: 8px; padding: 0 20px; background: radial-gradient(80% 120% at 85% 20%, rgba(0,134,255,0.30), transparent 60%), linear-gradient(135deg, #11163e, #0a0e22); }
+.res-cover.lens-cover .lens-logo { position: static; inset: auto; width: auto; height: 30px; }
+.res-cover.lens-cover .lens-div { width: 1px; height: 24px; background: rgba(255,255,255,0.32); }
+.res-cover.lens-cover .lens-word { font-family: var(--font-display); font-weight: 800; font-size: 1.9rem; line-height: 1; letter-spacing: 0.005em; color: var(--quantum-blue); }
 .res-cover .rc-mark path { fill: #fff; }
 .res-cover .rc-icon { position: relative; width: 46px; height: 46px; stroke: #fff; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .res-body { padding: 20px 22px; display: flex; flex-direction: column; flex: 1; }

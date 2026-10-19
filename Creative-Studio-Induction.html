@@ -41,11 +41,11 @@
 <span class="kpi-live"><span class="live-dot"></span><span id="kpiStatus">Loading…</span></span>
 </div>
 <div class="kpi-row">
-<div class="kpi fx d3" style="--kc:#0086ff"><div class="kpi-num"><span class="cnt" data-kpi="briefs">283</span></div><div class="kpi-lbl">Briefs delivered</div></div>
-<div class="kpi fx d4" style="--kc:#f42ca4"><div class="kpi-num"><span class="cnt" data-kpi="assets">4,422</span></div><div class="kpi-lbl">Assets delivered</div></div>
-<div class="kpi fx d4" style="--kc:#ff7a1a"><div class="kpi-num"><span class="cnt" data-kpi="hours">1,374</span>h</div><div class="kpi-lbl">Hours logged</div></div>
-<div class="kpi fx d5" style="--kc:#14c26a"><div class="kpi-num"><span class="cnt" data-kpi="avg">4.9</span>h</div><div class="kpi-lbl">Avg hours / brief</div></div>
-<div class="kpi fx d5" style="--kc:#00c2c7"><div class="kpi-num"><span class="cnt" data-kpi="aph">3.2</span></div><div class="kpi-lbl">Assets per hour</div></div>
+<div class="kpi fx d3" style="--kc:#0086ff"><div class="kpi-num"><span class="cnt" data-kpi="briefs">453</span></div><div class="kpi-lbl">Briefs delivered</div></div>
+<div class="kpi fx d4" style="--kc:#f42ca4"><div class="kpi-num"><span class="cnt" data-kpi="assets">5,876</span></div><div class="kpi-lbl">Assets delivered</div></div>
+<div class="kpi fx d4" style="--kc:#ff7a1a"><div class="kpi-num"><span class="cnt" data-kpi="hours">2,190</span>h</div><div class="kpi-lbl">Hours logged</div></div>
+<div class="kpi fx d5" style="--kc:#14c26a"><div class="kpi-num"><span class="cnt" data-kpi="avg">4.8</span>h</div><div class="kpi-lbl">Avg hours / brief</div></div>
+<div class="kpi fx d5" style="--kc:#00c2c7"><div class="kpi-num"><span class="cnt" data-kpi="aph">2.7</span></div><div class="kpi-lbl">Assets per hour</div></div>
 <div class="kpi fx d6" style="--kc:#8a5cff"><div class="kpi-num"><span class="cnt" data-kpi="brands">17</span></div><div class="kpi-lbl">Active brands</div></div>
 </div>
 </div>
@@ -469,17 +469,32 @@ return {briefs:briefs, assets:Math.round(assets), hours:Math.round(hours), avg:h
 aph: hours>0 ? assets/hours : 0, brands:Object.keys(brands).length};
 }
 function fmt(n,dec){ return Number(n).toLocaleString(undefined,{minimumFractionDigits:dec||0,maximumFractionDigits:dec||0}); }
+// KPI numbers animate exactly once, to the value we pass (live, or the fallback) — never to the baked-in placeholder.
+function animateCount(el,text){
+if(!el) return;
+if(el._raf){ cancelAnimationFrame(el._raf); el._raf=null; }
+var m=String(text).match(/[\d,]+(?:\.\d+)?/);
+if(!m){ el.textContent=text; return; }
+var numStr=m[0], prefix=text.slice(0,m.index), suffix=text.slice(m.index+numStr.length);
+var dec=(numStr.split('.')[1]||'').length, target=parseFloat(numStr.replace(/,/g,''));
+if(reduce){ el.textContent=text; return; }
+var t0=null, dur=1100;
+function f(v){ return prefix+v.toLocaleString(undefined,{minimumFractionDigits:dec,maximumFractionDigits:dec})+suffix; }
+el.textContent=f(0);
+function step(t){ if(!t0)t0=t; var k=Math.min((t-t0)/dur,1); k=1-Math.pow(1-k,3); el.textContent=f(target*k); if(k<1){ el._raf=requestAnimationFrame(step);} else { el.textContent=text; el._raf=null; } }
+el._raf=requestAnimationFrame(step);
+}
 function setKPI(key,text){
 var el=document.querySelector('.kpi [data-kpi="'+key+'"]'); if(!el) return;
-el.dataset.final=text;                        // live value is always authoritative
-if(el.dataset.done){                          // count-up already ran/running -> cancel & re-animate to live
-  if(el._raf){cancelAnimationFrame(el._raf); el._raf=null;}
-  el.dataset.done='';
-  if(document.documentElement.classList.contains('anim')) runCnt(el); else el.textContent=text;
-}else{
-  el.textContent=text;                        // not revealed yet; seed live (runCnt will use dataset.final on reveal)
+el.dataset.final=text;
+animateCount(el,text);
 }
+var KPI_KEYS=['briefs','assets','hours','avg','aph','brands'], KPI_FALLBACK={};
+// Capture the baked-in numbers (the no-JS values) then hold the cells blank so JS never counts to a stale figure.
+function holdKPIs(){
+KPI_KEYS.forEach(function(key){ var el=document.querySelector('.kpi [data-kpi="'+key+'"]'); if(!el) return; KPI_FALLBACK[key]=(el.textContent||'').trim(); el.textContent='–'; });
 }
+function applyFallback(){ KPI_KEYS.forEach(function(key){ if(KPI_FALLBACK[key]) setKPI(key, KPI_FALLBACK[key]); }); }
 function applyKPIs(k){
 setKPI('briefs', fmt(k.briefs));
 setKPI('assets', fmt(k.assets));
@@ -488,9 +503,14 @@ setKPI('avg',    fmt(k.avg,1));
 setKPI('aph',    fmt(k.aph,1));
 setKPI('brands', fmt(k.brands));
 }
-function loadKPIs(){
+function loadKPIs(attempt){
+attempt = attempt || 1;
 var st=document.getElementById('kpiStatus');
 if(!KPI_CONFIG.url){ return; }
+function retryOrGiveUp(){
+  if(attempt < 4){ if(st) st.textContent='Loading…'; setTimeout(function(){ loadKPIs(attempt+1); }, attempt*1500); }
+  else { if(st) st.textContent='Latest figures'; applyFallback(); }   // all retries failed — count up to the baked-in fallback
+}
 fetch(KPI_CONFIG.url,{cache:'no-store'})
 .then(function(res){ if(!res.ok) throw new Error(res.status); return res.json(); })
 .then(function(d){
@@ -499,22 +519,24 @@ var briefs=rows.length, assets=0, hours=0, brands={};
 rows.forEach(function(j){ var a=parseFloat(j.assets); if(!isNaN(a))assets+=a; var hh=parseFloat(j.hours); if(!isNaN(hh))hours+=hh; String(j.brand||'').split(',').forEach(function(b){ b=b.split(' - ')[0].trim(); if(b==='CAS')b='CBK'; if(b)brands[b]=1; }); });
 var k={briefs:briefs, assets:Math.round(assets), hours:Math.round(hours), avg:briefs?hours/briefs:0, aph:hours>0?assets/hours:0, brands:Object.keys(brands).length};
 if(k.briefs){ applyKPIs(k); if(st) st.textContent='Live from the task tracker'; }
+else { retryOrGiveUp(); }                           // empty/odd payload — try again
 })
-.catch(function(){ if(st) st.textContent='Latest figures'; });  // keep baked-in fallback
+.catch(retryOrGiveUp);
 }
+holdKPIs();   // blank the KPI numbers until the feed answers (prevents the count-to-stale-then-recount)
 if(reduce){
 loadKPIs();
 return; // leave everything visible/static
 }
 document.documentElement.classList.add('anim');
 loadKPIs();
-setTimeout(function(){document.querySelectorAll('.hero .cnt').forEach(runCnt);},300);
+setTimeout(function(){document.querySelectorAll('.hero .cnt:not([data-kpi])').forEach(runCnt);},300);
 var io=new IntersectionObserver(function(es){
 es.forEach(function(e){
 if(!e.isIntersecting)return;
 var t=e.target;
 t.classList.add('in');
-t.querySelectorAll('.cnt').forEach(runCnt);
+t.querySelectorAll('.cnt:not([data-kpi])').forEach(runCnt);
 io.unobserve(t);
 });
 },{threshold:.18,rootMargin:'0px 0px -8% 0px'});
