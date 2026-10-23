@@ -267,7 +267,9 @@
     }
 
     // ----- Delivered filter + table -----
-    const VAL = { brand: brandFilterVals, channel: j => cells(j.channel), type: j => (j.assetType ? [j.assetType.trim()] : []) };
+    // Asset type derived from the real static/motion/copy split (a "Both" brief counts as Static + Motion). Falls back to the label for legacy rows.
+    const typesOf = j => { const t = []; if (+j.assetsStatic > 0) t.push('Static'); if (+j.assetsMotion > 0) t.push('Motion'); if (+j.assetsCopy > 0) t.push('Copy'); return t.length ? t : (j.assetType ? [j.assetType.trim()] : []); };
+    const VAL = { brand: brandFilterVals, channel: j => cells(j.channel), type: typesOf };
     const uniqueValues = getVals => { const s = new Set(); DELIVERED.forEach(j => getVals(j).forEach(v => s.add(v))); return [...s].sort(); };
 
     function makeDropdown(mountId, label, key) {

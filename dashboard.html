@@ -229,6 +229,13 @@
       return { week: weeks, month: months, quarter: quarters, fy: fys };
     }
 
+    // Asset types from the real split (a "Both" brief = Static + Motion); falls back to the label for legacy rows.
+    function assetTypesOf(j) {
+      if (j.assetsStatic != null || j.assetsMotion != null || j.assetsCopy != null) {
+        const t = []; if (num(j.assetsStatic) > 0) t.push('Static'); if (num(j.assetsMotion) > 0) t.push('Motion'); if (num(j.assetsCopy) > 0) t.push('Copy'); return t;
+      }
+      return cells(j.assetType);
+    }
     function periodMetrics(p) {
       let briefs = 0, assets = 0, hours = 0, otScored = 0, otOk = 0; const brand = {}, chan = {}, type = {};
       ROWS.forEach(j => {
@@ -238,8 +245,15 @@
         [...new Set(brandCodes(j))].forEach(c => brand[c] = (brand[c] || 0) + 1);
         const chs = cells(j.channel); const hshare = num(j.hours) / (chs.length || 1);
         chs.forEach(c => chan[c] = (chan[c] || 0) + hshare);
-        const ts = cells(j.assetType); const ashare = num(j.assets) / (ts.length || 1);
-        ts.forEach(t => type[t] = (type[t] || 0) + ashare);
+        if (j.assetsStatic != null || j.assetsMotion != null || j.assetsCopy != null) {
+          const s = num(j.assetsStatic), m = num(j.assetsMotion), c = num(j.assetsCopy);
+          if (s > 0) type['Static'] = (type['Static'] || 0) + s;
+          if (m > 0) type['Motion'] = (type['Motion'] || 0) + m;
+          if (c > 0) type['Copy'] = (type['Copy'] || 0) + c;
+        } else {
+          const ts = cells(j.assetType); const ashare = num(j.assets) / (ts.length || 1);
+          ts.forEach(t => type[t] = (type[t] || 0) + ashare);
+        }
       });
       return { label: p.label, briefs, assets, hours, avg: briefs ? hours / briefs : 0, otScored, otOk, brand, chan, type };
     }
@@ -337,7 +351,7 @@
 
     // ---- On-time delivery (splittable) ----
     const otRate = list => { let sc = 0, ok = 0; list.forEach(j => { if (typeof j.onTime === 'boolean') { sc++; if (j.onTime) ok++; } }); return { sc: sc, ok: ok }; };
-    const otCats = (j, split) => split === 'brand' ? [...new Set(brandCodes(j))] : split === 'chan' ? cells(j.channel) : split === 'type' ? cells(j.assetType) : [];
+    const otCats = (j, split) => split === 'brand' ? [...new Set(brandCodes(j))] : split === 'chan' ? cells(j.channel) : split === 'type' ? assetTypesOf(j) : [];
     function otOpts(legend) {
       return Object.assign({}, BASE_OPTS, { plugins: Object.assign({}, BASE_OPTS.plugins, { legend: { display: legend, labels: BASE_OPTS.plugins.legend.labels } }), scales: { x: BASE_OPTS.scales.x, y: Object.assign({}, BASE_OPTS.scales.y, { max: 100, ticks: { callback: v => v + '%', font: { family: 'Proxima Nova' } } }) } });
     }

@@ -447,13 +447,22 @@
       document.getElementById('team-split').innerHTML = stackBar(hE, colourFor, k => k, v => v.toFixed(1) + 'h');
     }
 
-    // ---- By asset type (even-split) ----
+    // ---- By asset type (real static/motion/copy split; hours shared in proportion to the asset mix) ----
     function renderAssetType(delivered) {
       const tA = {}, tH = {};
       delivered.forEach(j => {
-        const types = [...new Set(cells(j.assetType))]; if (!types.length) return;
-        const n = types.length, a = num(j.assets) / n, h = num(j.hours) / n;
-        types.forEach(t => { tA[t] = (tA[t] || 0) + a; tH[t] = (tH[t] || 0) + h; });
+        const hasSplit = (j.assetsStatic != null || j.assetsMotion != null || j.assetsCopy != null);
+        const hrs = num(j.hours);
+        if (hasSplit) {
+          const parts = [['Static', num(j.assetsStatic)], ['Motion', num(j.assetsMotion)], ['Copy', num(j.assetsCopy)]].filter(p => p[1] > 0);
+          if (!parts.length) return;
+          const tot = parts.reduce((s, p) => s + p[1], 0);
+          parts.forEach(([name, qty]) => { tA[name] = (tA[name] || 0) + qty; tH[name] = (tH[name] || 0) + (tot ? hrs * qty / tot : hrs / parts.length); });
+        } else {
+          const types = [...new Set(cells(j.assetType))]; if (!types.length) return;
+          const n = types.length, a = num(j.assets) / n, h = hrs / n;
+          types.forEach(t => { tA[t] = (tA[t] || 0) + a; tH[t] = (tH[t] || 0) + h; });
+        }
       });
       const aE = sortedEntries(tA), hE = sortedEntries(tH);
       const cmap = {};
