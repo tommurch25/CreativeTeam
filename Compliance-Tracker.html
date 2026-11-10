@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <title>Compliance tracker — Creative Hub</title>
+  <link rel="icon" href="assets/logos/favicon_master.svg" />
+  <link rel="stylesheet" href="assets/styles.css?v=74" />
+  <script src="assets/app.js?v=60" defer></script>
+  <style>
+    .ct-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 28px}
+    .ct-tab{appearance:none;border:1px solid #d5dbe5;background:#fff;color:#0b1b34;font:inherit;font-weight:600;padding:9px 20px;border-radius:999px;cursor:pointer;transition:all .2s}
+    .ct-tab:hover{border-color:#0086ff;color:#0086ff}
+    .ct-tab[aria-selected="true"]{background:#0086ff;border-color:#0086ff;color:#fff}
+    .ct-panel[hidden]{display:none}
+    .ct-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+    .ct-card{background:#fff;border:1px solid #e3e8f0;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:10px}
+    .ct-card h3{margin:0;font-size:1.1rem}
+    .ct-card p{margin:0;color:#4a5a73;line-height:1.55}
+    .ct-card ul{margin:0;padding-left:18px;color:#4a5a73;line-height:1.6}
+    .ct-tag{align-self:flex-start;font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#0086ff;background:rgba(0,134,255,.1);padding:4px 10px;border-radius:999px}
+    .ct-tag.rose{color:#f42ca4;background:rgba(244,44,164,.1)}
+    .ct-link{margin-top:auto;font-weight:600;color:#0086ff;text-decoration:none}
+    .ct-link:hover{text-decoration:underline}
+    .ct-note{margin-top:20px;color:#6b7a93;font-size:.85rem}
+    .ct-filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 20px}
+    .ct-feed{display:flex;flex-direction:column;gap:12px}
+    .ct-item{display:grid;grid-template-columns:92px 1fr auto;gap:18px;align-items:start;background:#fff;border:1px solid #e3e8f0;border-radius:14px;padding:18px 22px;text-decoration:none;color:inherit;transition:transform .2s,border-color .2s}
+    .ct-item:hover{transform:translateY(-2px);border-color:#0086ff}
+    .ct-date{font-size:.8rem;font-weight:600;color:#6b7a93;padding-top:3px}
+    .ct-title{font-weight:600;color:#0b1b34;line-height:1.4}
+    .ct-src{font-size:.82rem;color:#6b7a93;margin-top:4px}
+    .ct-mk{font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:999px;background:#0b1b34;color:#fff}
+    .ct-mk.us{background:#f42ca4}
+    .ct-mk.uk{background:#0086ff}
+    .ct-state{padding:28px;text-align:center;color:#6b7a93;background:#fff;border:1px dashed #d5dbe5;border-radius:14px}
+    @media (max-width:640px){.ct-item{grid-template-columns:1fr}.ct-mk{justify-self:start}}
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html" aria-label="Quantum Creative Hub" style="display:flex;align-items:center;gap:12px;">
+        <img src="assets/logos/quantum_logo_master_blue.svg" alt="Quantum" />
+        <span style="color:var(--chrome-dark-40);">|</span>
+        <span style="font-weight:600;color:var(--muted);font-size:0.95rem;">Creative Hub</span>
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="index.html">Home</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="team.html">Team</a>
+        <a href="data.html">Data</a>
+        <a href="resources.html" class="active">Resources</a>
+        <a href="showcase.html">Showcase</a>
+        <a class="nav-cta nav-cta-blue" href="https://solis.bynder.com/" target="_blank" rel="noopener">Solis ↗</a>
+        <a class="nav-cta" href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
+      </div>
+      <button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <main class="banded">
+    <div class="band band-grey"><div class="wrap">
+      <section class="hero compact">
+        <div class="eyebrow"><span class="dot"></span> Compliance tracker</div>
+        <h1>Get it right before it ships.</h1>
+        <p class="lead">What the creative team needs to know about advertising compliance in the UK and US, plus the latest breaches and rulings across the industry.</p>
+      </section>
+    </div></div>
+
+    <!-- Reference -->
+    <div class="band band-white"><div class="wrap">
+      <div class="section-head"><h2>Reference</h2><span class="meta">Rules and guidance by market</span></div>
+
+      <div class="ct-tabs" role="tablist" aria-label="Market">
+        <button class="ct-tab" role="tab" aria-selected="true" data-m="uk">United Kingdom</button>
+        <button class="ct-tab" role="tab" aria-selected="false" data-m="us">United States</button>
+      </div>
+
+      <!--
+        PLACEHOLDER CONTENT: replace each .ct-card with the real guidance.
+        Duplicate a card to add more. Use ct-tag.rose for "must not" items.
+      -->
+      <div class="ct-panel" id="ct-uk">
+        <div class="ct-grid">
+          <div class="ct-card">
+            <span class="ct-tag">Regulator</span>
+            <h3>Who sets the rules</h3>
+            <p>Placeholder: summary of the UKGC, ASA and CAP roles and how they apply to our work.</p>
+            <a class="ct-link" href="https://www.asa.org.uk/codes-and-rulings/advertising-codes.html" target="_blank" rel="noopener">CAP and BCAP codes ↗</a>
+          </div>
+          <div class="ct-card">
+            <span class="ct-tag">Checklist</span>
+            <h3>Before you submit</h3>
+            <ul>
+              <li>Placeholder check one</li>
+              <li>Placeholder check two</li>
+              <li>Placeholder check three</li>
+            </ul>
+          </div>
+          <div class="ct-card">
+            <span class="ct-tag rose">Avoid</span>
+            <h3>Common breaches</h3>
+            <ul>
+              <li>Placeholder breach one</li>
+              <li>Placeholder breach two</li>
+              <li>Placeholder breach three</li>
+            </ul>
+          </div>
+          <div class="ct-card">
+            <span class="ct-tag">Documents</span>
+            <h3>Full guidance</h3>
+            <p>Placeholder: link out to your internal compliance PDFs and policies.</p>
+            <a class="ct-link" href="https://www.gamblingcommission.gov.uk/" target="_blank" rel="noopener">UK Gambling Commission ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="ct-panel" id="ct-us" hidden>
+        <div class="ct-grid">
+          <div class="ct-card">
+            <span class="ct-tag">Regulator</span>
+            <h3>Who sets the rules</h3>
+            <p>Placeholder: summary of the FTC, state regulators and how sweepstakes and promo law applies to our work.</p>
+            <a class="ct-link" href="https://www.ftc.gov/business-guidance/advertising-marketing" target="_blank" rel="noopener">FTC advertising guidance ↗</a>
+          </div>
+          <div class="ct-card">
+            <span class="ct-tag">Checklist</span>
+            <h3>Before you submit</h3>
+            <ul>
+              <li>Placeholder check one</li>
+              <li>Placeholder check two</li>
+              <li>Placeholder check three</li>
+            </ul>
+          </div>
+          <div class="ct-card">
+            <span class="ct-tag rose">Avoid</span>
+            <h3>Common breaches</h3>
+            <ul>
+              <li>Placeholder breach one</li>
+              <li>Placeholder breach two</li>
+              <li>Placeholder breach three</li>
+            </ul>
+          </div>
+          <div class="ct-card">
+            <span class="ct-tag">Documents</span>
+            <h3>Full guidance</h3>
+            <p>Placeholder: link out to your internal compliance PDFs and policies.</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="ct-note">Guidance only. When in doubt, check with Compliance before anything goes live.</p>
+    </div></div>
+
+    <!-- Live feed -->
+    <div class="band band-grey"><div class="wrap">
+      <div class="section-head acc-orange"><h2>Live feed</h2><span class="meta" id="ct-meta">Recent breaches and rulings of note</span></div>
+      <div class="ct-filters" role="tablist" aria-label="Feed market">
+        <button class="ct-tab" role="tab" aria-selected="true" data-f="all">All</button>
+        <button class="ct-tab" role="tab" aria-selected="false" data-f="uk">UK</button>
+        <button class="ct-tab" role="tab" aria-selected="false" data-f="us">US</button>
+      </div>
+      <div class="ct-feed" id="ct-feed"><div class="ct-state">Loading</div></div>
+      <p class="ct-note">Pulled automatically from regulator feeds and refreshed hourly. Headlines link to the original source.</p>
+    </div></div>
+  </main>
+
+  <footer>
+    <div class="wrap footer-grid">
+      <div class="foot-brand">
+        <img class="foot-logo" src="assets/logos/quantum_logo_white.svg" alt="Quantum" />
+        <p class="foot-tag">The creative team's hub — brief in work, follow jobs, and see how the studio is performing.</p>
+        <a class="foot-corp" href="https://www.quantum.media/" target="_blank" rel="noopener">quantum.media ↗</a>
+      </div>
+      <nav class="foot-nav" aria-label="Footer">
+        <div class="foot-col-title">Explore</div>
+        <a href="index.html">Home</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="team.html">Team</a>
+        <a href="data.html">Data</a>
+        <a href="resources.html">Resources</a>
+        <a href="showcase.html">Showcase</a>
+      </nav>
+      <div class="foot-actions">
+        <div class="foot-col-title">Get in touch</div>
+        <a class="foot-fb" href="https://slack.com/app_redirect?channel=U08KV5Q7B6W" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>Send feedback</a>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
+      </div>
+    </div>
+    <div class="wrap footer-bar">
+      <span>Quantum Creative Hub</span>
+      <span>Internal use only · V1.04</span>
+    </div>
+  </footer>
+
+  <script>
+  (function(){
+    var DATA_URL = 'https://script.google.com/macros/s/AKfycbz10YPP7Fk9U_Y-WXpAuRXsvrBU4mWvNlfU9jXVY1pB2g8e9Y2pVlc7gZLv8E5Y5FtWXQ/exec';
+
+    // Reference tabs
+    var mtabs = document.querySelectorAll('.ct-tabs .ct-tab');
+    mtabs.forEach(function(b){
+      b.addEventListener('click', function(){
+        mtabs.forEach(function(x){ x.setAttribute('aria-selected', x === b ? 'true' : 'false'); });
+        ['uk','us'].forEach(function(m){ document.getElementById('ct-' + m).hidden = (m !== b.dataset.m); });
+      });
+    });
+
+    // Live feed
+    var items = [], filter = 'all';
+    var box = document.getElementById('ct-feed');
+    function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+    function fmt(iso){
+      var d = new Date(iso); if (isNaN(d)) return '';
+      return d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    }
+    function render(){
+      var list = items.filter(function(i){ return filter === 'all' || i.market === filter; });
+      if (!list.length) { box.innerHTML = '<div class="ct-state">No items to show right now.</div>'; return; }
+      box.innerHTML = list.map(function(i){
+        return '<a class="ct-item" href="' + esc(i.link) + '" target="_blank" rel="noopener">'
+          + '<div class="ct-date">' + esc(fmt(i.date)) + '</div>'
+          + '<div><div class="ct-title">' + esc(i.title) + '</div><div class="ct-src">' + esc(i.source) + '</div></div>'
+          + '<span class="ct-mk ' + esc(i.market) + '">' + esc(String(i.market).toUpperCase()) + '</span></a>';
+      }).join('');
+    }
+    document.querySelectorAll('.ct-filters .ct-tab').forEach(function(b){
+      b.addEventListener('click', function(){
+        document.querySelectorAll('.ct-filters .ct-tab').forEach(function(x){ x.setAttribute('aria-selected', x === b ? 'true' : 'false'); });
+        filter = b.dataset.f; render();
+      });
+    });
+    fetch(DATA_URL + '?feed=compliance')
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        items = (d && d.items) || [];
+        if (d && d.updated) document.getElementById('ct-meta').textContent = 'Updated ' + fmt(d.updated);
+        render();
+      })
+      .catch(function(){ box.innerHTML = '<div class="ct-state">The live feed is unavailable right now. Please try again shortly.</div>'; });
+  })();
+  </script>
+</body>
+</html>
