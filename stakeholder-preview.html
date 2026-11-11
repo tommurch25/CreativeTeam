@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light" />
+<title>By stakeholder — preview</title>
+<style>
+  :root{ --quantum-blue:#0086ff; --qubit-rose:#f42ca4; --text:#3d4449; --muted:#8b8f92; --line:#e4e6e8; --white:#fff; --canvas-alt:#f5f6f7; --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{ font-family:var(--font); color:var(--text); background:#f7f8f9; }
+  .band{ padding:40px 0; }
+  .wrap{ max-width:1120px; margin:0 auto; padding:0 24px; }
+  .preview-note{ background:#fff4d6; border:1px solid #f0d98a; color:#7a5c00; font-size:.85rem; font-weight:600; padding:10px 14px; border-radius:10px; margin-bottom:22px; }
+  .section-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }
+  .section-head h2{ font-size:1.6rem; letter-spacing:-.01em; }
+  .section-head .meta{ color:var(--muted); font-size:.85rem; font-weight:600; }
+  .sub{ margin:-4px 0 18px; color:var(--muted); font-size:.9rem; }
+  .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  @media(max-width:900px){ .grid-3{ grid-template-columns:repeat(2,1fr);} }
+  @media(max-width:620px){ .grid-3{ grid-template-columns:1fr;} }
+  .team-card{ background:var(--white); border:1px solid var(--line); border-radius:16px; padding:22px 24px; box-shadow:0 1px 2px rgba(61,68,73,.04); }
+  .team-head{ display:flex; align-items:center; gap:12px; }
+  .tinfo{ flex:1; min-width:0; }
+  .team-name{ font-weight:800; font-size:1.05rem; }
+  .team-role{ color:var(--muted); font-size:.85rem; font-weight:600; margin-top:3px; }
+  .team-count{ background:var(--quantum-blue); color:#fff; font-weight:800; font-size:.9rem; min-width:30px; height:30px; padding:0 10px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; }
+  .team-jobs{ margin-top:16px; border-top:1px solid var(--line); padding-top:12px; }
+  .tj-row{ display:flex; align-items:center; gap:8px; padding:9px 0; font-size:.85rem; border-bottom:1px solid var(--line); }
+  .tj-row:last-child{ border-bottom:none; }
+  .team-jobs a.tj-row{ color:var(--text); text-decoration:none; transition:color .15s ease; }
+  .team-jobs a.tj-row:hover{ color:var(--quantum-blue); }
+  .team-jobs a.tj-row svg{ width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:2; opacity:.55; flex:none; }
+  .team-jobs .stk-row{ flex-direction:column; align-items:flex-start; gap:3px; }
+  .team-jobs .stk-main{ display:flex; align-items:center; gap:6px; font-weight:600; }
+  .team-jobs .stk-meta{ font-size:.75rem; color:var(--muted); font-weight:600; }
+  .team-jobs .stk-meta .od{ color:#e0301e; font-weight:700; }
+</style>
+</head>
+<body>
+  <div class="band"><div class="wrap">
+    <div class="preview-note">Preview with sample data — this is how the live "By stakeholder" section renders, now with Submitted + Due on each brief.</div>
+    <div class="section-head"><h2>By stakeholder</h2><span class="meta" id="stake-count"></span></div>
+    <p class="sub">Live briefs grouped by who they're for (from each card's "Project From"). Click a brief to open its Trello card.</p>
+    <div class="grid-3" id="stake-grid"></div>
+  </div></div>
+
+  <script>
+    var EXT = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>';
+    var numJN = function(s){ return parseInt(String(s||'').replace(/\D/g,''),10)||0; };
+    var esc = function(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
+    var T = 'https://trello.com/b/nQsWDZPA/creative-team';
+    // SAMPLE live briefs (stand-in for the feed's in-progress rows)
+    var INPROGRESS = [
+      {jobNumber:'JN1565', title:'World Cup 2026 key visual',      stakeholder:'Moses Ogunbayo', submitted:'2 Oct', due:'10 Oct', status:'In progress', trelloUrl:T},
+      {jobNumber:'JN1572', title:'Big Bass Bonanza promo banners', stakeholder:'Moses Ogunbayo', submitted:'29 Sep', due:'3 Oct', status:'Overdue',     trelloUrl:T},
+      {jobNumber:'JN1568', title:'Weekly email header refresh',    stakeholder:'Sarah Jenkins',  submitted:'30 Sep', due:'8 Oct', status:'In progress', trelloUrl:T},
+      {jobNumber:'JN1569', title:'Roulette landing page',          stakeholder:'Sarah Jenkins',  submitted:'1 Oct', due:'9 Oct', status:'In progress', trelloUrl:T},
+      {jobNumber:'JN1574', title:'Sweeps Wheel asset pack',        stakeholder:'Sarah Jenkins',  submitted:'1 Oct', due:'', status:'In progress', trelloUrl:T},
+      {jobNumber:'JN1570', title:'Buffalo Wild & Wise social set',  stakeholder:'Daniel Price',   submitted:'28 Sep', due:'6 Oct', status:'In progress', trelloUrl:T},
+      {jobNumber:'JN1575', title:'Incoming brief (no stakeholder)', stakeholder:'',              submitted:'1 Oct', due:'7 Oct', status:'Pending',     trelloUrl:T}
+    ];
+
+    function renderStakeholders(){
+      var grid = document.getElementById('stake-grid');
+      var groups = {};
+      INPROGRESS.forEach(function(j){ var s=(j.stakeholder||'').trim(); if(!s) return; (groups[s]=groups[s]||[]).push(j); });
+      var names = Object.keys(groups).sort(function(a,b){ return groups[b].length-groups[a].length || a.localeCompare(b); });
+      var total = names.reduce(function(n,k){ return n+groups[k].length; },0);
+      document.getElementById('stake-count').textContent = names.length + ' stakeholder' + (names.length>1?'s':'') + ' · ' + total + ' live brief' + (total>1?'s':'');
+      grid.innerHTML = names.map(function(n){
+        var jobs = groups[n].slice().sort(function(a,b){ return numJN(a.jobNumber)-numJN(b.jobNumber); });
+        var rows = jobs.map(function(j){
+          var label = esc((j.jobNumber?j.jobNumber+' · ':'')+(j.title||'Untitled'));
+          var sub = j.submitted ? 'Submitted ' + esc(j.submitted) : '';
+          var dueTxt = j.due ? 'Due ' + esc(j.due) : 'No due date';
+          var dueSpan = j.status === 'Overdue' ? '<span class="od">'+dueTxt+'</span>' : dueTxt;
+          var meta = '<span class="stk-meta">'+sub+(sub?' · ':'')+dueSpan+'</span>';
+          return '<a class="tj-row stk-row" href="'+j.trelloUrl+'" target="_blank" rel="noopener"><span class="stk-main">'+label+' '+EXT+'</span>'+meta+'</a>';
+        }).join('');
+        return '<div class="team-card"><div class="team-head"><div class="tinfo"><div class="team-name">'+esc(n)+'</div><div class="team-role">'+jobs.length+' live brief'+(jobs.length>1?'s':'')+'</div></div><span class="team-count">'+jobs.length+'</span></div><div class="team-jobs">'+rows+'</div></div>';
+      }).join('');
+    }
+    renderStakeholders();
+  </script>
+</body>
+</html>

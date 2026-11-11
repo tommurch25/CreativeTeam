@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light" />
+<title>Your jobs — mockup</title>
+<style>
+  :root{ --blue:#0086ff; --rose:#f42ca4; --text:#3d4449; --muted:#8b8f92; --line:#e4e6e8; --white:#fff; --canvas:#f7f8f9; --canvas-alt:#f5f6f7; --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{ font-family:var(--font); color:var(--text); background:var(--canvas); }
+  .wrap{ max-width:1120px; margin:0 auto; padding:0 24px; }
+  .band{ padding:34px 0; }
+  .note{ background:#fff4d6; border:1px solid #f0d98a; color:#7a5c00; font-size:.85rem; font-weight:600; padding:10px 14px; border-radius:10px; margin:22px auto 0; max-width:1120px; width:calc(100% - 48px); }
+
+  /* ---- personalised hero slide ---- */
+  .hero{ position:relative; overflow:hidden; border-radius:20px; background:var(--blue); color:#fff; padding:48px 52px; }
+  .hero .eyebrow{ display:inline-flex; align-items:center; gap:8px; text-transform:uppercase; letter-spacing:.12em; font-size:.72rem; font-weight:800; }
+  .hero .eyebrow .dot{ width:8px; height:8px; border-radius:50%; background:#fff; display:inline-block; }
+  .hero h1{ font-size:2.5rem; line-height:1.1; max-width:760px; margin:14px 0 22px; }
+  .hero-jobs{ display:flex; flex-direction:column; gap:8px; max-width:640px; }
+  .hj{ display:flex; align-items:center; justify-content:space-between; gap:14px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.22); border-radius:12px; padding:12px 16px; color:#fff; text-decoration:none; font-weight:600; font-size:.95rem; transition:background .15s ease; }
+  .hj:hover{ background:rgba(255,255,255,.2); }
+  .hj .hj-due{ font-size:.82rem; opacity:.9; white-space:nowrap; font-weight:700; }
+  .hj .hj-due.od{ color:#ffd0e4; }
+  .btn-row{ display:flex; flex-wrap:wrap; gap:12px; margin-top:24px; }
+  .btn{ display:inline-flex; align-items:center; gap:8px; font-weight:800; font-size:1rem; padding:14px 26px; border-radius:8px; border:2px solid transparent; cursor:pointer; text-decoration:none; }
+  .btn-rose{ background:var(--rose); color:#fff; }
+  .btn-ghost{ background:transparent; border-color:rgba(255,255,255,.6); color:#fff; }
+
+  /* ---- Your jobs section ---- */
+  .section-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:6px; }
+  .section-head h2{ font-size:1.6rem; }
+  .section-head .meta{ color:var(--muted); font-size:.85rem; font-weight:600; }
+  .sub{ color:var(--muted); font-size:.9rem; margin:0 0 18px; }
+  .yj-list{ display:flex; flex-direction:column; gap:12px; }
+  .yj{ display:grid; grid-template-columns:1fr auto; gap:6px 16px; align-items:center; background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px 20px; box-shadow:0 1px 2px rgba(61,68,73,.04); text-decoration:none; color:var(--text); transition:border-color .15s ease, transform .15s ease, box-shadow .15s ease; }
+  .yj:hover{ border-color:var(--blue); transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,134,255,.1); }
+  .yj-title{ font-weight:800; font-size:1rem; }
+  .yj-meta{ color:var(--muted); font-size:.8rem; font-weight:600; margin-top:2px; }
+  .yj-meta .od{ color:#e0301e; font-weight:700; }
+  .yj-right{ grid-row:1 / span 2; display:flex; align-items:center; gap:10px; }
+  .pill{ font-size:.72rem; font-weight:800; letter-spacing:.02em; padding:4px 10px; border-radius:999px; background:var(--canvas-alt); color:var(--muted); border:1px solid var(--line); white-space:nowrap; }
+  .pill.live{ background:#e7f0ff; color:var(--blue); border-color:transparent; }
+  .pill.od{ background:#fde7e7; color:#e0301e; border-color:transparent; }
+  .open{ color:var(--blue); font-weight:800; font-size:.85rem; white-space:nowrap; }
+</style>
+</head>
+<body>
+  <div class="note">Mock-up with sample data — shows the personalised carousel slide and the "Your jobs" section. Real version shows the signed-in person's own live briefs.</div>
+
+  <div class="band"><div class="wrap">
+    <!-- personalised carousel slide (slide 1 of the hero) -->
+    <section class="hero">
+      <div class="eyebrow"><span class="dot"></span> Your work</div>
+      <h1>Hi Tom — these are your jobs currently in progress.</h1>
+      <div class="hero-jobs">
+        <a class="hj"><span>JN1565 · World Cup 2026 key visual</span><span class="hj-due">Due 10 Oct</span></a>
+        <a class="hj"><span>JN1572 · Big Bass Bonanza promo banners</span><span class="hj-due od">Overdue · 3 Oct</span></a>
+        <a class="hj"><span>JN1580 · Buffalo Wild &amp; Wise social set</span><span class="hj-due">Due 12 Oct</span></a>
+      </div>
+      <div class="btn-row">
+        <a class="btn btn-rose">View all your jobs →</a>
+        <a class="btn btn-ghost">Brief in work ↗</a>
+      </div>
+    </section>
+  </div></div>
+
+  <div class="band" style="background:var(--canvas);"><div class="wrap">
+    <!-- Your jobs section (under Jobs) -->
+    <div class="section-head"><h2>Your jobs</h2><span class="meta">3 in progress · 1 overdue</span></div>
+    <p class="sub">Everything currently assigned to you, soonest due first.</p>
+    <div class="yj-list">
+      <a class="yj">
+        <div><div class="yj-title">JN1572 · Big Bass Bonanza promo banners</div><div class="yj-meta">SlotsWise · Submitted 29 Sep · <span class="od">Due 3 Oct</span></div></div>
+        <div class="yj-right"><span class="pill od">Overdue</span><span class="open">Open ↗</span></div>
+      </a>
+      <a class="yj">
+        <div><div class="yj-title">JN1565 · World Cup 2026 key visual</div><div class="yj-meta">Betway · Submitted 2 Oct · Due 10 Oct</div></div>
+        <div class="yj-right"><span class="pill live">In progress</span><span class="open">Open ↗</span></div>
+      </a>
+      <a class="yj">
+        <div><div class="yj-title">JN1580 · Buffalo Wild &amp; Wise social set</div><div class="yj-meta">SlotsWise · Submitted 4 Oct · Due 12 Oct</div></div>
+        <div class="yj-right"><span class="pill live">In progress</span><span class="open">Open ↗</span></div>
+      </a>
+    </div>
+  </div></div>
+</body>
+</html>

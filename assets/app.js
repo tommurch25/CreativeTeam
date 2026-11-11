@@ -86,8 +86,7 @@
   // unlinked Dashboard / FY report (uncomment below to make them findable).
   var LINKS = [
     { t: 'Home', d: 'The hub home page', u: 'index.html', k: 'home start overview landing' },
-    { t: 'Jobs', d: 'In progress & delivered work', u: 'jobs.html', k: 'jobs work delivered in progress tracker status board what shipped' },
-    { t: 'Team', d: 'The creative team', u: 'team.html', k: 'team people designers who staff members' },
+    { t: 'Jobs', d: 'Live work, team capacity, stakeholders & delivered', u: 'jobs.html', k: 'jobs work delivered in progress tracker status board what shipped team people designers who staff members capacity stakeholders kanban' },
     { t: 'Data', d: 'Studio performance & stats', u: 'data.html', k: 'data stats kpi performance numbers metrics analytics' },
     { t: 'Resources', d: 'Guidelines, tools & links', u: 'resources.html', k: 'resources guidelines tools links templates' },
     { t: 'Showcase', d: 'Case studies & standout work', u: 'showcase.html', k: 'showcase case study proud work portfolio' },
