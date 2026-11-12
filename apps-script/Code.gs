@@ -60,6 +60,16 @@ function cardRefs(url) {
 
 // Map every card in the "Completed" list to its due date AND its designer(s) — the card
 // members that match the creative team. Keyed by shortLink and card number.
+// 'zaid.arabikatbi@quantum.media' -> 'Zaid Arabi-Katbi' (compare letters only, so hyphens and dots don't matter)
+function teamFromEmail(email) {
+  var local = String(email || '').split('@')[0].toLowerCase().replace(/[^a-z]/g, '');
+  if (!local) return '';
+  for (var i = 0; i < TEAM_NAMES.length; i++) {
+    if (TEAM_NAMES[i].toLowerCase().replace(/[^a-z]/g, '') === local) return TEAM_NAMES[i];
+  }
+  return '';
+}
+
 function getCompletedMaps() {
   var due = {}, members = {}, names = {};
   var lists = trello('boards/' + BOARD_ID + '/lists?fields=name');
@@ -561,7 +571,9 @@ function formatTypes(fmt) {
   var f = String(fmt || '').toLowerCase(), out = [];
   var both = /\bboth\b/.test(f);                       // legacy "Both" = static + motion
   if (both || /static/.test(f)) out.push('static');
-  if (both || /motion|video|animation/.test(f)) out.push('motion');
+  var app = /\bapp\b|interactive/.test(f);                // App / Interactive builds are priced as static + motion
+  if (app && out.indexOf('static') === -1) out.push('static');
+  if (both || app || /motion|video|animation/.test(f)) out.push('motion');
   if (/copy|content/.test(f)) out.push('copy');
   return out;
 }
@@ -686,6 +698,7 @@ function getDelivered(dueMap, memberMap, nameMap) {
       iStatic = col('static asset'), iMotion = col('motion asset'), iCopy = col('copy asset'),
       iAssetsLegacy = col('how many assets'),   // legacy single "how many assets" column (pre-split)
       iTitle = col('brief title', 'job title', 'task name', 'project name', 'brief name');   // specific only — avoid matching 'Brief Quality'
+  var iEmail = col('email address', 'email');            // who submitted the delivery form = the designer
   var hasSplit = (iStatic > -1 || iMotion > -1 || iCopy > -1);   // sheet now records the static/motion/copy split
 
   var now = new Date();
@@ -749,12 +762,13 @@ function getDelivered(dueMap, memberMap, nameMap) {
     var rowOnTime = (valid && oDue) ? (deliveredISO <= new Date(oDue).toISOString().slice(0, 10)) : null;
     var oDesigner = oRefs ? (memberMap['s' + oRefs.s] || (oRefs.n ? memberMap['n' + oRefs.n] : null)) : null;
 
+    var emailName = iEmail > -1 ? teamFromEmail(row[iEmail]) : '';   // submitter's email -> team member (most reliable)
     var oName = oRefs ? (nameMap['s' + oRefs.s] || (oRefs.n ? nameMap['n' + oRefs.n] : '')) : '';
     rows.push({
       jobNumber: jnFormat(job),
       title: (iTitle > -1 ? String(row[iTitle]).trim() : '') || oName || '',
       onTime: rowOnTime,
-      designer: oDesigner || [],
+      designer: emailName ? [emailName] : (oDesigner || []),   // email first, Trello members as fallback
       assetType: typeCell,
       brand: brandCell,
       channel: channelCell,

@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light" />
   <title>Jobs — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=204" />
+  <link rel="stylesheet" href="assets/styles.css?v=205" />
   <script src="assets/app.js?v=61" defer></script>
 </head>
 <body>
@@ -182,27 +182,30 @@
     // from briefs that were a single format. Hours are split between co-designers.
     function avgHours() {
       const cutoff = isoToday(); cutoff.setDate(cutoff.getDate() - 90);
-      const per = {}, pt = {}, tt = {}; let tH = 0, tN = 0;
-      const add = (o, k, h) => { const p = o[k] || (o[k] = { h: 0, n: 0 }); p.h += h; p.n += 1; };
+      const per = {}, pt = {}, tt = {}, all = [];
+      const push = (o, k, h) => { (o[k] || (o[k] = [])).push(h); };
+      const crew = PEOPLE.map(p => p.n);          // only the creative team count (Tom's occasional jobs are left out)
       DELIVERED.forEach(r => {
         if (!r.hours || !r.deliveredISO || new Date(r.deliveredISO) < cutoff) return;
-        const ds = (r.designer || []); if (!ds.length) return;
+        const ds = (r.designer || []).filter(n => crew.indexOf(n) > -1); if (!ds.length) return;
         const tys = ['static', 'motion', 'copy'].filter(t => (r['assets' + t[0].toUpperCase() + t.slice(1)] || 0) > 0);
-        ds.forEach(n => { add(per, n, r.hours / ds.length); if (tys.length === 1) add(pt, n + '|' + tys[0], r.hours / ds.length); });
-        if (tys.length === 1) add(tt, tys[0], r.hours);
-        tH += r.hours; tN += 1;
+        ds.forEach(n => { push(per, n, r.hours / ds.length); if (tys.length === 1) push(pt, n + '|' + tys[0], r.hours / ds.length); });
+        if (tys.length === 1) push(tt, tys[0], r.hours);
+        all.push(r.hours);
       });
-      const team = tN ? tH / tN : 4;
-      const mean = p => p && p.n >= 3 ? p.h / p.n : null;
+      // Typical time = the median, so a handful of very long entries can't drag every estimate up
+      const med = a => { const s = a.slice().sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+      const team = all.length ? med(all) : 4;
+      const mean = a => a && a.length >= 3 ? med(a) : null;
       const personAvg = n => mean(per[n]) || team;
       const hoursFor = (name, j) => {
         const ty = (j.types && j.types.length) ? j.types : null;
-        if (!ty) return { total: personAvg(name), parts: [{ k: 'other', h: personAvg(name), src: mean(per[name]) ? 'their overall average' : 'team average' }] };
+        if (!ty) return { total: personAvg(name), parts: [{ k: 'other', h: personAvg(name), src: mean(per[name]) ? 'their typical time' : 'team typical time' }] };
         const parts = ty.map(t => {
           const a = mean(pt[name + '|' + t]), b = mean(tt[t]);
-          return { k: t, h: a || b || personAvg(name), src: a ? 'their ' + t + ' average' : b ? 'team ' + t + ' average' : (mean(per[name]) ? 'their overall average' : 'team average') };
+          return { k: t, h: a || b || personAvg(name), src: a ? 'their typical ' + t + ' time' : b ? 'team typical ' + t + ' time' : (mean(per[name]) ? 'their typical time' : 'team typical time') };
         });
-        return { total: parts.reduce((a, p) => a + p.h, 0), parts };
+        return { total: parts.reduce((x, p) => x + p.h, 0), parts };
       };
       return { team, hoursFor };
     }
@@ -383,7 +386,7 @@
             `<div class="ov2-sub">~${Math.round(queued)}h briefed in, about ${daysOf(queued)} of work, against ${Math.round(avail)}h team capacity over the next 5 working days</div></div>` +
           `<div class="ov2-pt"><div class="ov2-ch"><span class="k">Capacity by person</span></div><div class="ov-people">${people}</div></div>` +
         `</div>` +
-        `<div class="ov-note">Estimate based on average hours per brief over the last 90 days, by format where the brief states one.${noFmt ? ' ' + noFmt + ' of ' + n + ' briefs have no Format on their Trello card, so their format (marked ~) is guessed from the title.' : ''}</div>`;
+        `<div class="ov-note">Estimate based on typical (median) hours per brief over the last 90 days, by format where the brief states one.${noFmt ? ' ' + noFmt + ' of ' + n + ' briefs have no Format on their Trello card, so their format (marked ~) is guessed from the title.' : ''}</div>`;
     }
 
     // ---- board scroll affordance: chips, arrows, hint (one factory, used by both boards) ----
@@ -545,7 +548,13 @@
 
     // ----- Delivered filter + table -----
     // Asset type derived from the real static/motion/copy split (a "Both" brief counts as Static + Motion). Falls back to the label for legacy rows.
-    const typesOf = j => { const t = []; if (+j.assetsStatic > 0) t.push('Static'); if (+j.assetsMotion > 0) t.push('Motion'); if (+j.assetsCopy > 0) t.push('Copy'); return t.length ? t : (j.assetType ? [j.assetType.trim()] : []); };
+    const typesOf = j => {
+      const t = []; if (+j.assetsStatic > 0) t.push('Static'); if (+j.assetsMotion > 0) t.push('Motion'); if (+j.assetsCopy > 0) t.push('Copy');
+      const lab = String(j.assetType || '').trim();
+      if (!t.length && lab) { if (/both/i.test(lab)) t.push('Static', 'Motion'); else if (/copy|content/i.test(lab)) t.push('Copy'); else t.push(lab); }   // no counts logged: fall back to the label
+      if (/^(app|interactive)$/i.test(lab)) t.push(lab[0].toUpperCase() + lab.slice(1).toLowerCase());   // App / Interactive get their own filter value
+      return t;
+    };
     const VAL = { brand: brandFilterVals, channel: j => cells(j.channel), type: typesOf, designer: designers };
     const uniqueValues = getVals => { const s = new Set(); DELIVERED.forEach(j => getVals(j).forEach(v => s.add(v))); return [...s].sort(); };
 
