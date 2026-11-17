@@ -455,9 +455,11 @@
       equalise();
     }
 
-    async function load() {
+    let lastLoad = 0;
+    async function load(refresh) {
       try { const r = await fetch(DATA_URL, { cache: 'no-store' }); const d = await r.json(); INPROGRESS = d.inProgress || []; ABSENCE = d.absence || {}; DELIVERED = d.delivered || []; window.__meta = d.brandMeta || {}; }
       catch (e) {
+        if (refresh) return;   // background refresh failed: keep showing what we already have
         const msg = '<div class="kb-loading">Live data unavailable right now. Please try again shortly.</div>';
         document.getElementById('kb').innerHTML = msg; buildNav();
         const sk = document.getElementById('sk'); if (sk) sk.innerHTML = msg;
@@ -465,11 +467,19 @@
         const dv = document.getElementById('delivered-body'); if (dv) dv.innerHTML = '<tr><td class="empty" colspan="10">Live data unavailable right now. Please try again shortly.</td></tr>';
         return;
       }
+      lastLoad = Date.now(); window.__avg = null;
+      const kbEl = document.getElementById('kb'), skEl = document.getElementById('sk');
+      const kbX = kbEl ? kbEl.scrollLeft : 0, skX = skEl ? skEl.scrollLeft : 0;   // keep scroll position across refreshes
       renderTeam();
       renderStakeholders();
+      if (refresh) { if (kbEl) kbEl.scrollLeft = kbX; if (skEl) skEl.scrollLeft = skX; }
       if (window.initDelivered) window.initDelivered(DELIVERED, window.__meta); else window.__deliveredPending = { rows: DELIVERED, meta: window.__meta };
     }
     load();
+    // Keep the page fresh without a manual reload: refresh every 5 minutes while the tab is open and visible,
+    // and straight away when someone comes back to a tab that has been idle for 5 minutes or more.
+    setInterval(() => { if (!document.hidden) load(true); }, 300000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - lastLoad > 300000) load(true); });
   </script>
   <script>
   // Delivered table (moved here from the Jobs page)

@@ -107,6 +107,9 @@ function doGet(e) {
   if (e && e.parameter && e.parameter.debug === 'format') {
     return ContentService.createTextOutput(JSON.stringify(formatDebug())).setMimeType(ContentService.MimeType.JSON);
   }
+  if (e && e.parameter && e.parameter.debug === 'lists') {
+    return ContentService.createTextOutput(JSON.stringify(listsDebug())).setMimeType(ContentService.MimeType.JSON);
+  }
   if (e && e.parameter && e.parameter.debug === 'absence') {
     return ContentService.createTextOutput(JSON.stringify(absenceDebug())).setMimeType(ContentService.MimeType.JSON);
   }
@@ -526,6 +529,23 @@ function prettyStake(s) {
 
 // Diagnostic: open <exec-url>?debug=format (or run formatDebug in the editor) to see which in-progress
 // cards have a recognised Format line, and what the description looks like on the ones that don't.
+// Diagnostic: open <exec-url>?debug=lists to see every list on the Trello board, how many open cards it holds,
+// and whether the hub reads it. Any list marked read:false is NOT shown on the hub.
+function listsDebug() {
+  var lists = trello('boards/' + BOARD_ID + '/lists?fields=name');
+  var out = [], read = 0, unread = 0;
+  lists.forEach(function (l) {
+    var name = (l.name || '').trim();
+    var isRead = IN_PROGRESS_LISTS.indexOf(name) > -1 || PENDING_LISTS.indexOf(name) > -1;
+    var n = trello('lists/' + l.id + '/cards?fields=name').length;
+    out.push({ list: name, openCards: n, read: isRead, role: IN_PROGRESS_LISTS.indexOf(name) > -1 ? 'in progress (owner)' : (PENDING_LISTS.indexOf(name) > -1 ? 'pending' : (/completed/i.test(name) ? 'used for designers and due dates' : 'ignored')) });
+    if (isRead) read += n; else unread += n;
+  });
+  var res = { cardsRead: read, cardsInIgnoredLists: unread, lists: out };
+  Logger.log(JSON.stringify(res, null, 1));
+  return res;
+}
+
 function formatDebug() {
   var rows = getInProgress(true), withFmt = 0, out = [];
   rows.forEach(function (r) {
