@@ -1300,3 +1300,14 @@ html { scroll-behavior: smooth; }
 .kb-pend .sk-n { background: #fff4e0; color: #b26b00; }
 .kb-pend .kb-ch { border-top: 4px solid #ff9f1c; }
 .kb-empty { background: var(--white); border: 1px dashed #c4cfdf; border-radius: 12px; padding: 18px 14px; color: var(--muted); font-size: .88rem; font-weight: 600; text-align: center; }
+
+.ov2-bl { font-size: .68rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: rgba(255,255,255,.9); margin: -14px 0 32px; }
+.ov2-bl.two { display: flex; justify-content: space-between; align-items: center; margin: 22px 0 32px; }
+.ov2-sub + .ov2-bl.two { border-top: 1px solid rgba(255,255,255,.25); padding-top: 16px; }
+.ov2-cap .ov2-sc { margin-bottom: 10px; }
+.ov2-bl.two .cap-pill { font-size: .72rem; font-weight: 700; letter-spacing: normal; text-transform: none; padding: 3px 10px; }
+.ov2-cap .tl-bar + .ov2-sub, .ov2-barw + .ov2-sub { margin-top: 16px; }
+
+.ov2-ch.ov2-title { margin-bottom: 18px; }
+.ov2-ch.ov2-title .k { font-size: 1.05rem; letter-spacing: .06em; }
+.ov2-bl.two.first { margin: 0 0 32px; }

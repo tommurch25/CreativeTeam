@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light" />
   <title>Jobs — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=205" />
+  <link rel="stylesheet" href="assets/styles.css?v=209" />
   <script src="assets/app.js?v=61" defer></script>
 </head>
 <body>
@@ -276,7 +276,7 @@
         const pct = avail > 0 ? queued / avail * 100 : (queued > 0 ? Infinity : 0);
         const st = pctState(pct, active.length);
         const free = avail - queued;
-        ROWS.push({ name: p.n, queued, avail, pct, st, n: active.length, overN, holdN: holds.length, noFmt: active.filter(j => j.formatGuessed).length });
+        ROWS.push({ copy: /copywriter/i.test(p.r), name: p.n, queued, avail, pct, st, n: active.length, overN, holdN: holds.length, noFmt: active.filter(j => j.formatGuessed).length });
 
         const hrs = { static: 0, motion: 0, copy: 0, other: 0 };
         est.forEach(e => e.parts.forEach(x => { hrs[x.k] += x.h; }));
@@ -348,8 +348,10 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(equalise);
     window.addEventListener('load', equalise);
 
-    function renderOverview(rows) {
-      const box = document.getElementById('team-overview'); if (!box || !rows.length) return;
+    function renderOverview(allRows) {
+      const box = document.getElementById('team-overview'); if (!box || !allRows.length) return;
+      const rows = allRows.filter(r => !r.copy);   // capacity bars are design-focused: copy (Joe) supports on briefs, so he sits outside the totals
+      if (!rows.length) return;
       const queued = rows.reduce((t, r) => t + r.queued, 0), avail = rows.reduce((t, r) => t + r.avail, 0);
       const noFmt = rows.reduce((t, r) => t + r.noFmt, 0), n = rows.reduce((t, r) => t + r.n, 0);
       const pct = avail > 0 ? queued / avail * 100 : (queued > 0 ? Infinity : 0);
@@ -367,7 +369,13 @@
       const clears = (perDay > 0 && queued > 0) ? addWorkdays(isoToday(), Math.max(1, Math.ceil(queued / perDay))) : null;
       const left = (Math.min(120, Math.max(0, isFinite(pct) ? pct : 120)) / 120 * 100).toFixed(1);
       const lbl = isFinite(pct) ? '~' + Math.round(pct) + '%' : '—';
-      const sorted = rows.slice().sort((a, b) => (isFinite(b.pct) ? b.pct : 999) - (isFinite(a.pct) ? a.pct : 999));
+      // Second bar: assigned work + unassigned (pending) briefs at team-average estimates
+      const pendD = INPROGRESS.filter(j => j.status === 'Pending' && !isHold(j) && !isHeader(j)).map(j => { window.__avg = window.__avg || avgHours(); return window.__avg.hoursFor('', j).parts.filter(x => x.k !== 'copy').reduce((t, x) => t + x.h, 0); }).filter(h => h > 0);
+      const pendH = pendD.reduce((t, h) => t + h, 0), waitingD = pendD.length;   // design hours only; copy-only briefs are left out
+      const allH = queued + pendH, pct2 = avail > 0 ? allH / avail * 100 : (allH > 0 ? Infinity : 0), st2 = pctState(pct2, n + waitingD);
+      const left2 = (Math.min(120, Math.max(0, isFinite(pct2) ? pct2 : 120)) / 120 * 100).toFixed(1);
+      const lbl2 = isFinite(pct2) ? '~' + Math.round(pct2) + '%' : '—';
+      const sorted = allRows.slice().sort((a, b) => (isFinite(b.pct) ? b.pct : 999) - (isFinite(a.pct) ? a.pct : 999));
       const people = sorted.map(r => {
         const w = isFinite(r.pct) ? Math.min(100, r.pct) : 100;
         return `<div class="ov-p"><span class="ov-pn">${esc(r.name.split(' ')[0])}</span><span class="ov-pb"><i class="${r.st[1]}" style="width:${w.toFixed(0)}%"></i></span><span class="ov-pp">${isFinite(r.pct) ? Math.round(r.pct) + '%' : '—'}</span></div>`;
@@ -380,13 +388,17 @@
           `<div class="ov2-t wh"><span class="k">Assigned work clears</span><b>${clears ? dayFmt(clears) : (queued > 0 ? '—' : 'Now')}</b><span class="s">${queued > 0 ? 'if no new work is added' : 'nothing assigned'}</span></div>` +
         `</div>` +
         `<div class="ov2-split">` +
-          `<div class="ov2-cap"><div class="ov2-ch"><span class="k">Estimated team capacity</span><span class="cap-pill ${st[1]}">${st[0]}</span></div>` +
+          `<div class="ov2-cap"><div class="ov2-ch ov2-title"><span class="k">Estimated design capacity</span></div>` +
+            `<div class="ov2-bl two first"><span>Assigned work only</span><span class="cap-pill ${st[1]}">${st[0]}</span></div>` +
             `<div class="ov2-barw"><span class="ov2-pct" style="left:${left}%">${lbl}</span><div class="tl-bar"><span class="z ok"></span><span class="z warn"></span><span class="z full"></span><span class="tl-pin ${st[1]}" style="left:${left}%"></span></div></div>` +
+            `<div class="ov2-sub">~${Math.round(queued)}h briefed in, about ${daysOf(queued)} of work, against ${Math.round(avail)}h design capacity over the next 5 working days</div>` +
+            `<div class="ov2-bl two"><span>Including unassigned</span><span class="cap-pill ${st2[1]}">${st2[0]}</span></div>` +
+            `<div class="ov2-barw"><span class="ov2-pct" style="left:${left2}%">${lbl2}</span><div class="tl-bar"><span class="z ok"></span><span class="z warn"></span><span class="z full"></span><span class="tl-pin ${st2[1]}" style="left:${left2}%"></span></div></div>` +
             `<div class="ov2-sc"><span class="ok"><i></i>Capacity up to 80%</span><span class="warn"><i></i>Stretching 80–90%</span><span class="full"><i></i>Over 90%+</span></div>` +
-            `<div class="ov2-sub">~${Math.round(queued)}h briefed in, about ${daysOf(queued)} of work, against ${Math.round(avail)}h team capacity over the next 5 working days</div></div>` +
+            `<div class="ov2-sub">+ ~${Math.round(pendH)}h from ${waitingD} unassigned design ${waitingD === 1 ? 'brief' : 'briefs'} (team-average estimate), ~${Math.round(allH)}h in total</div></div>` +
           `<div class="ov2-pt"><div class="ov2-ch"><span class="k">Capacity by person</span></div><div class="ov-people">${people}</div></div>` +
         `</div>` +
-        `<div class="ov-note">Estimate based on typical (median) hours per brief over the last 90 days, by format where the brief states one.${noFmt ? ' ' + noFmt + ' of ' + n + ' briefs have no Format on their Trello card, so their format (marked ~) is guessed from the title.' : ''}</div>`;
+        `<div class="ov-note">Estimate based on typical (median) hours per brief over the last 90 days, by format where the brief states one. Capacity bars cover the design team; Joe (copy) supports on briefs and shows under Capacity by person only. Unassigned briefs use the team average, design hours only.${noFmt ? ' ' + noFmt + ' of ' + n + ' briefs have no Format on their Trello card, so their format (marked ~) is guessed from the title.' : ''}</div>`;
     }
 
     // ---- board scroll affordance: chips, arrows, hint (one factory, used by both boards) ----
