@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light" />
   <title>Jobs — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=209" />
+  <link rel="stylesheet" href="assets/styles.css?v=216" />
   <script src="assets/app.js?v=61" defer></script>
 </head>
 <body>
@@ -370,16 +370,21 @@
       const left = (Math.min(120, Math.max(0, isFinite(pct) ? pct : 120)) / 120 * 100).toFixed(1);
       const lbl = isFinite(pct) ? '~' + Math.round(pct) + '%' : '—';
       // Second bar: assigned work + unassigned (pending) briefs at team-average estimates
+      const dn = h => { const d = h / DAY_H; return String(d >= 10 ? Math.round(d) : Math.round(d * 10) / 10); }, capD = dn(avail);   // days of work out of days of capacity (capacity already net of leave)
       const pendD = INPROGRESS.filter(j => j.status === 'Pending' && !isHold(j) && !isHeader(j)).map(j => { window.__avg = window.__avg || avgHours(); return window.__avg.hoursFor('', j).parts.filter(x => x.k !== 'copy').reduce((t, x) => t + x.h, 0); }).filter(h => h > 0);
       const pendH = pendD.reduce((t, h) => t + h, 0), waitingD = pendD.length;   // design hours only; copy-only briefs are left out
       const allH = queued + pendH, pct2 = avail > 0 ? allH / avail * 100 : (allH > 0 ? Infinity : 0), st2 = pctState(pct2, n + waitingD);
       const left2 = (Math.min(120, Math.max(0, isFinite(pct2) ? pct2 : 120)) / 120 * 100).toFixed(1);
       const lbl2 = isFinite(pct2) ? '~' + Math.round(pct2) + '%' : '—';
       const sorted = allRows.slice().sort((a, b) => (isFinite(b.pct) ? b.pct : 999) - (isFinite(a.pct) ? a.pct : 999));
-      const people = sorted.map(r => {
+      const prow = r => {
         const w = isFinite(r.pct) ? Math.min(100, r.pct) : 100;
-        return `<div class="ov-p"><span class="ov-pn">${esc(r.name.split(' ')[0])}</span><span class="ov-pb"><i class="${r.st[1]}" style="width:${w.toFixed(0)}%"></i></span><span class="ov-pp">${isFinite(r.pct) ? Math.round(r.pct) + '%' : '—'}</span></div>`;
-      }).join('');
+        return `<div class="ov-p"><span class="ov-pn">${esc(r.name.split(' ')[0])}</span><span class="ov-pb"><i class="${r.st[1]}" style="width:${w.toFixed(0)}%"></i></span><span class="ov-ph">${Math.round(r.queued)}h of ${Math.round(r.avail)}h</span><span class="ov-pp">${isFinite(r.pct) ? Math.round(r.pct) + '%' : '—'}</span></div>`;
+      };
+      const people = sorted.filter(r => !r.copy).map(prow).join('') + (sorted.some(r => r.copy) ? `<div class="ov-div">Copy support</div>` + sorted.filter(r => r.copy).map(prow).join('') : '');
+      const bar = (l, pc, ps, lb, h, pill) => `<div class="ov2-row"><div class="ov2-bl two"><span>${l}<em> · ${Math.round(h)}h · ${dn(h)} / ${capD} days of work</em></span>${pill}</div>` +
+        `<div class="ov2-barw"><span class="ov2-pct" style="left:${pc}%">${lb}</span><div class="tl-bar"><span class="z ok"></span><span class="z warn"></span><span class="z full"></span><span class="tl-pin ${ps}" style="left:${pc}%"></span></div></div></div>`;
+      const pillA = st[0] !== st2[0] ? `<span class="cap-pill ${st[1]}">${st[0]}</span>` : '';   // header pill = status incl. unassigned; per-bar pill only when it differs
       box.innerHTML =
         `<div class="ov2-tiles">` +
           `<div class="ov2-t"><span class="k"><i class="d" style="background:#fff"></i>In progress</span><b>${live}</b><span class="s">${holdAll} on hold${overAll ? ' · ' + overAll + ' overdue' : ''}</span></div>` +
@@ -387,18 +392,21 @@
           `<div class="ov2-t"><span class="k"><i class="d" style="background:#1fe27a"></i>Delivered this week</span><b>${week}</b><span class="s">jobs shipped</span></div>` +
           `<div class="ov2-t wh"><span class="k">Assigned work clears</span><b>${clears ? dayFmt(clears) : (queued > 0 ? '—' : 'Now')}</b><span class="s">${queued > 0 ? 'if no new work is added' : 'nothing assigned'}</span></div>` +
         `</div>` +
+        `<div class="ov2-stats">` +
+          `<div class="ov2-st"><span class="k">Assigned work</span><b>${Math.round(queued)}h</b><span class="s">${dn(queued)} / ${capD} days of work</span></div>` +
+          `<div class="ov2-st"><span class="k">Unassigned</span><b>${Math.round(pendH)}h</b><span class="s">${dn(pendH)} / ${capD} days · ${waitingD} ${waitingD === 1 ? 'brief' : 'briefs'}</span></div>` +
+          `<div class="ov2-st tot"><span class="k">Total to deliver</span><b>${Math.round(allH)}h</b><span class="s">${dn(allH)} / ${capD} days of work</span></div>` +
+          `<div class="ov2-st"><span class="k">Design capacity</span><b>${Math.round(avail)}h</b><span class="s">${capD} days · after leave, next 5 working days</span></div>` +
+        `</div>` +
         `<div class="ov2-split">` +
-          `<div class="ov2-cap"><div class="ov2-ch ov2-title"><span class="k">Estimated design capacity</span></div>` +
-            `<div class="ov2-bl two first"><span>Assigned work only</span><span class="cap-pill ${st[1]}">${st[0]}</span></div>` +
-            `<div class="ov2-barw"><span class="ov2-pct" style="left:${left}%">${lbl}</span><div class="tl-bar"><span class="z ok"></span><span class="z warn"></span><span class="z full"></span><span class="tl-pin ${st[1]}" style="left:${left}%"></span></div></div>` +
-            `<div class="ov2-sub">~${Math.round(queued)}h briefed in, about ${daysOf(queued)} of work, against ${Math.round(avail)}h design capacity over the next 5 working days</div>` +
-            `<div class="ov2-bl two"><span>Including unassigned</span><span class="cap-pill ${st2[1]}">${st2[0]}</span></div>` +
-            `<div class="ov2-barw"><span class="ov2-pct" style="left:${left2}%">${lbl2}</span><div class="tl-bar"><span class="z ok"></span><span class="z warn"></span><span class="z full"></span><span class="tl-pin ${st2[1]}" style="left:${left2}%"></span></div></div>` +
+          `<div class="ov2-cap"><div class="ov2-ch ov2-title"><span class="k">Estimated design capacity</span><span class="cap-pill ${st2[1]}">${st2[0]}</span></div>` +
+            bar('Assigned work only', left, st[1], lbl, queued, pillA) +
+            bar('Including unassigned', left2, st2[1], lbl2, allH, '') +
             `<div class="ov2-sc"><span class="ok"><i></i>Capacity up to 80%</span><span class="warn"><i></i>Stretching 80–90%</span><span class="full"><i></i>Over 90%+</span></div>` +
-            `<div class="ov2-sub">+ ~${Math.round(pendH)}h from ${waitingD} unassigned design ${waitingD === 1 ? 'brief' : 'briefs'} (team-average estimate), ~${Math.round(allH)}h in total</div></div>` +
+            `<div class="ov2-sub">Includes ${waitingD} unassigned design ${waitingD === 1 ? 'brief' : 'briefs'} (~${Math.round(pendH)}h) at team-average estimates</div></div>` +
           `<div class="ov2-pt"><div class="ov2-ch"><span class="k">Capacity by person</span></div><div class="ov-people">${people}</div></div>` +
         `</div>` +
-        `<div class="ov-note">Estimate based on typical (median) hours per brief over the last 90 days, by format where the brief states one. Capacity bars cover the design team; Joe (copy) supports on briefs and shows under Capacity by person only. Unassigned briefs use the team average, design hours only.${noFmt ? ' ' + noFmt + ' of ' + n + ' briefs have no Format on their Trello card, so their format (marked ~) is guessed from the title.' : ''}</div>`;
+        `<details class="ov-how"><summary>How we estimate</summary><div class="ov-note">Typical (median) hours per brief over the last 90 days, by format where the brief states one. Capacity is the design team (5 days × 7.5h each, minus approved leave); Joe (copy) supports on briefs and appears under Capacity by person only. Unassigned briefs use the team average, design hours only.${noFmt ? ' ' + noFmt + ' of ' + n + ' briefs have no Format on their Trello card, so their format (marked ~) is guessed from the title.' : ''}</div></details>`;
     }
 
     // ---- board scroll affordance: chips, arrows, hint (one factory, used by both boards) ----
