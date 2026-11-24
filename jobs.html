@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light" />
   <title>Jobs — Creative Hub</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=220" />
+  <link rel="stylesheet" href="assets/styles.css?v=221" />
   <script src="assets/app.js?v=61" defer></script>
 </head>
 <body>
@@ -341,6 +341,7 @@
       cols.unshift(`<div class="kb-col kb-pend" data-i="0">${pHead}${pBody}</div>`);
       document.getElementById('kb').innerHTML = cols.join('');
       document.querySelectorAll('.kb-ph img').forEach(im => { im.onerror = () => { im.replaceWith(Object.assign(document.createElement('div'), { className: 'kb-av', textContent: im.alt.split(' ').map(w => w[0]).join('') })); }; });
+      window.__rows = ROWS;
       renderOverview(ROWS);
       (() => {
         const pend = INPROGRESS.filter(j => j.status === 'Pending').length, live = INPROGRESS.length - pend, od = INPROGRESS.filter(j => j.status === 'Overdue').length;
@@ -365,10 +366,22 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(equalise);
     window.addEventListener('load', equalise);
 
+    const EXKEY = 'hubCapacityExcluded';
+    function exclSet() { try { return new Set(JSON.parse(localStorage.getItem(EXKEY) || '[]')); } catch (e) { return new Set(); } }
+    function saveExcl(set) { try { localStorage.setItem(EXKEY, JSON.stringify([...set])); } catch (e) {} }
+    document.addEventListener('change', e => {
+      const c = e.target.closest && e.target.closest('.ov-ck'); if (!c) return;
+      const set = exclSet(); if (c.checked) set.delete(c.dataset.n); else set.add(c.dataset.n);
+      saveExcl(set); if (window.__rows) renderOverview(window.__rows);
+    });
+    document.addEventListener('click', e => { if (e.target.closest && e.target.closest('.ov-reset')) { saveExcl(new Set()); if (window.__rows) renderOverview(window.__rows); } });
     function renderOverview(allRows) {
       const box = document.getElementById('team-overview'); if (!box || !allRows.length) return;
-      const rows = allRows.filter(r => !r.copy);   // capacity bars are design-focused: copy (Joe) supports on briefs, so he sits outside the totals
-      if (!rows.length) return;
+      const designRows = allRows.filter(r => !r.copy);   // capacity bars are design-focused: copy (Joe) supports on briefs, so he sits outside the totals
+      if (!designRows.length) return;
+      const EX = exclSet();                               // people ticked off by this viewer: their work AND capacity leave the totals
+      const rows = designRows.filter(r => !EX.has(r.name));
+      const exNames = designRows.filter(r => EX.has(r.name)).map(r => r.name.split(' ')[0]);
       const queued = rows.reduce((t, r) => t + r.queued, 0), avail = rows.reduce((t, r) => t + r.avail, 0);
       const noFmt = rows.reduce((t, r) => t + r.noFmt, 0), n = rows.reduce((t, r) => t + r.n, 0);
       const pct = avail > 0 ? queued / avail * 100 : (queued > 0 ? Infinity : 0);
@@ -396,7 +409,8 @@
       const sorted = allRows.slice().sort((a, b) => (isFinite(b.pct) ? b.pct : 999) - (isFinite(a.pct) ? a.pct : 999));
       const prow = r => {
         const w = isFinite(r.pct) ? Math.min(100, r.pct) : 100;
-        return `<div class="ov-p"><span class="ov-pn">${esc(r.name.split(' ')[0])}</span><span class="ov-pb"><i class="${r.st[1]}" style="width:${w.toFixed(0)}%"></i></span><span class="ov-ph">${Math.round(r.queued)}h of ${Math.round(r.avail)}h</span><span class="ov-pp">${isFinite(r.pct) ? Math.round(r.pct) + '%' : '—'}</span></div>`;
+        const ck = r.copy ? '<span class="ov-ck-sp"></span>' : `<input type="checkbox" class="ov-ck" data-n="${esc(r.name)}" ${EX.has(r.name) ? '' : 'checked'} aria-label="Include ${esc(r.name.split(' ')[0])} in the totals" title="${EX.has(r.name) ? 'Left out of the totals. Tick to include.' : 'Included in the totals. Untick to leave out.'}">`;
+        return `<div class="ov-p${EX.has(r.name) ? ' off' : ''}">${ck}<span class="ov-pn">${esc(r.name.split(' ')[0])}</span><span class="ov-pb"><i class="${r.st[1]}" style="width:${w.toFixed(0)}%"></i></span><span class="ov-ph">${Math.round(r.queued)}h of ${Math.round(r.avail)}h</span><span class="ov-pp">${isFinite(r.pct) ? Math.round(r.pct) + '%' : '—'}</span></div>`;
       };
       const people = sorted.filter(r => !r.copy).map(prow).join('') + (sorted.some(r => r.copy) ? `<div class="ov-div">Copy support</div>` + sorted.filter(r => r.copy).map(prow).join('') : '');
       const bar = (l, pc, ps, lb, h, pill) => `<div class="ov2-row"><div class="ov2-bl two"><span>${l}<em> · ${Math.round(h)}h · ${dn(h)} / ${capD} days of work</em></span>${pill}</div>` +
@@ -417,12 +431,12 @@
           `<div class="ov2-st"><span class="k">Design capacity</span><b>${Math.round(avail)}h</b><span class="s">${capD} days · after leave, next 5 working days</span></div>` +
         `</div>` +
         `<div class="ov2-split">` +
-          `<div class="ov2-cap"><div class="ov2-ch ov2-title"><span class="k">Estimated design capacity</span></div>` +
+          `<div class="ov2-cap"><div class="ov2-ch ov2-title"><span class="k">Estimated design capacity</span>${exNames.length ? '<span class="ov-excl">Excluding ' + esc(exNames.join(', ')) + '</span>' : ''}</div>` +
             bar('Assigned work only', left, st[1], lbl, queued, pillA) +
             bar('Including unassigned', left2, st2[1], lbl2, allH, pillB) +
             `<div class="ov2-sc"><span class="ok"><i></i>Capacity up to 80%</span><span class="warn"><i></i>Stretching 80–90%</span><span class="full"><i></i>Over 90%+</span></div>` +
             `<div class="ov2-sub">Includes ${waitingD} unassigned design ${waitingD === 1 ? 'brief' : 'briefs'} (~${Math.round(pendH)}h) at team-average estimates</div></div>` +
-          `<div class="ov2-pt"><div class="ov2-ch ov2-title"><span class="k">Capacity by person</span></div><div class="ov-people">${people}</div></div>` +
+          `<div class="ov2-pt"><div class="ov2-ch ov2-title"><span class="k">Capacity by person</span>${exNames.length ? '<button type="button" class="ov-reset">Include everyone</button>' : ''}</div><div class="ov-people">${people}</div></div>` +
         `</div>` +
         `<details class="ov-how"><summary>How we estimate</summary><div class="ov-note">Typical (median) hours per brief over the last 90 days, by format where the brief states one. Capacity is the design team (5 days × 7.5h each, minus approved leave); Joe (copy) supports on briefs and appears under Capacity by person only. Unassigned briefs use the team average, design hours only.${noFmt ? ' ' + noFmt + ' of ' + n + ' briefs have no Format on their Trello card, so their format (marked ~) is guessed from the title.' : ''}</div></details>`;
     }
@@ -549,7 +563,7 @@
       pop.innerHTML = `<div class="ed-h">Adjust time <span>#${esc(jn.replace('JN', ''))}</span></div><div class="ed-s">${esc(j.title || '')}</div>` +
         `<div class="ed-t">Typical for this brief: <b>${Math.round(typ * 10) / 10}h</b></div>` +
         `<label>Hours for this job<input type="number" id="ed-h" min="0.5" max="400" step="0.5" value="${cur ? cur.hours : Math.round(typ * 2) / 2}"></label>` +
-        `<label>Why? (optional)<input type="text" id="ed-n" maxlength="200" placeholder="e.g. six-week campaign build" value="${esc(cur ? cur.note : '')}"></label>` +
+        `<label>Why? (required)<input type="text" id="ed-n" maxlength="200" required placeholder="e.g. 50 cutdowns across six weeks" value="${esc(cur ? cur.note : '')}"></label>` +
         `<div class="ed-err" id="ed-e"></div><div class="ed-b"><button type="button" class="ed-save">Save</button>${cur ? '<button type="button" class="ed-clr">Use typical</button>' : ''}<button type="button" class="ed-x">Cancel</button></div>`;
       document.body.appendChild(pop);
       const b = btn.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
@@ -561,6 +575,7 @@
       const pop = document.getElementById('ed-pop'); if (!pop || !ME) return;
       const jn = pop.dataset.jn, err = document.getElementById('ed-e'), hrs = parseFloat(document.getElementById('ed-h').value);
       if (action === 'set' && !(hrs > 0 && hrs <= 400)) { err.textContent = 'Enter hours between 0.5 and 400.'; return; }
+      if (action === 'set' && document.getElementById('ed-n').value.trim().length < 3) { err.textContent = 'Please say why the time is changing.'; document.getElementById('ed-n').focus(); return; }
       pop.querySelectorAll('button').forEach(x => x.disabled = true); err.textContent = 'Saving…';
       try {
         const d = await hubPost({ action, token: ME.token, job: jn, hours: hrs, note: document.getElementById('ed-n').value });

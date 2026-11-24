@@ -1393,3 +1393,12 @@ html { scroll-behavior: smooth; }
 .ed-b button { font: inherit; font-weight: 800; border-radius: 99px; padding: 8px 16px; cursor: pointer; border: 1px solid #cfd8e6; background: #fff; color: #0b1b3a; }
 .ed-b .ed-save { background: var(--quantum-blue); border-color: var(--quantum-blue); color: #fff; }
 .ed-b button:disabled { opacity: .5; cursor: default; }
+
+/* Tick people in or out of the capacity totals */
+.ov-p { grid-template-columns: 18px 58px minmax(0, 1fr) auto 40px !important; }
+.ov-ck { width: 16px; height: 16px; margin: 0; accent-color: #fff; cursor: pointer; }
+.ov-ck-sp { display: block; width: 16px; }
+.ov-p.off { opacity: .5; }
+.ov-p.off .ov-pn { text-decoration: line-through; }
+.ov-excl { font-size: .72rem; font-weight: 800; background: #fff; color: #b0156f; padding: 3px 10px; border-radius: 99px; }
+.ov-reset { font: inherit; font-size: .72rem; font-weight: 800; background: #fff; color: var(--quantum-blue); border: 0; border-radius: 99px; padding: 4px 12px; cursor: pointer; }
