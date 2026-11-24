@@ -68,6 +68,33 @@
   else init();
 })();
 
+/* Shared: "Logged in as" in the top bar, from the Quantum Gate sign-in (/whoami). Display only. */
+(function () {
+  function init() {
+    var links = document.getElementById('nav-links');
+    if (!links) return;
+    fetch('/whoami', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d || !d.token) return;
+      var b = JSON.parse(decodeURIComponent(escape(atob(d.token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))));
+      var email = String(b.email || ''), full = String(b.name || '').trim();
+      var first = full.split(/\s+/)[0] || email.split('@')[0].split(/[._-]/)[0];
+      if (!first) return;
+      first = first.charAt(0).toUpperCase() + first.slice(1);
+      var parts = full.split(/\s+/).filter(Boolean);
+      var ini = parts.length > 1 ? parts[0].charAt(0) + parts[parts.length - 1].charAt(0) : first.charAt(0);
+      var el = document.createElement('span');
+      el.className = 'nav-user';
+      el.setAttribute('role', 'img');
+      el.setAttribute('aria-label', 'Logged in as ' + (full || first));
+      el.title = 'Logged in as ' + (full || first) + (email ? ' (' + email + ')' : '');
+      el.textContent = ini.toUpperCase();
+      links.appendChild(el);
+    }).catch(function () { /* not behind the Gate: show nothing */ });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
 /* ============================================================
    Smart helper — floating "find a job or a link" assistant.
    Client-side only: searches a curated link list + the live
