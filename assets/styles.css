@@ -1361,3 +1361,35 @@ html { scroll-behavior: smooth; }
 .ov2-split .ov2-cap { border-right: 1px solid rgba(255,255,255,.28); }
 @media (max-width: 900px) { .ov2-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ov2-split .ov2-cap { border-right: 0; border-bottom: 1px solid rgba(255,255,255,.28); padding-bottom: 20px; margin-bottom: 20px; } }
 .ov2-st.tot b { color: #f42ca4; }
+
+/* V2.02c: two separate, equal tiles */
+.ov2-split { background: none; border-radius: 0; padding: 0; gap: 14px; }
+.ov2-split .ov2-cap, .ov2-split .ov2-pt { background: rgba(255,255,255,.15); border-radius: 14px; padding: 22px 24px; border: 0; margin: 0; }
+.ov2-split .ov2-ch.ov2-title { min-height: 34px; align-items: center; margin-bottom: 20px; }
+.ov2-split .ov2-ch.ov2-title .k { font-size: 1.05rem; letter-spacing: .06em; }
+@media (max-width: 900px) { .ov2-split .ov2-cap { border: 0; padding-bottom: 22px; margin-bottom: 0; } }
+/* consistent 14px gutters between every tile in the overview */
+.ov2-tiles { gap: 14px !important; margin-bottom: 14px !important; }
+.ov2-stats { gap: 14px !important; margin-bottom: 14px !important; }
+.ov2-split { gap: 14px !important; margin: 0 !important; }
+.team-overview .ov-how { margin-top: 14px; }
+
+/* Nominated editors: adjust time */
+.kb-est.set { background: #0b1b3a; color: #fff; }
+.kb-edit { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-left: -2px; border-radius: 50%; border: 1px solid #cfd8e6; background: #fff; color: var(--quantum-blue); cursor: pointer; padding: 0; }
+.kb-edit:hover { background: var(--quantum-blue); color: #fff; border-color: var(--quantum-blue); }
+.ed-box { display: inline-flex; align-items: center; gap: 10px; margin-left: 14px; font-size: .78rem; font-weight: 700; vertical-align: middle; }
+.ed-on { color: #12804a; background: #e3f7ec; padding: 4px 10px; border-radius: 99px; }
+.ed-off { color: #b0156f; }
+.ed-out { border: 0; background: none; color: var(--quantum-blue); font: inherit; font-weight: 700; cursor: pointer; text-decoration: underline; padding: 0; }
+.ed-pop { position: fixed; z-index: 9999; width: 300px; background: #fff; color: #0b1b3a; border-radius: 14px; box-shadow: 0 12px 40px rgba(11,27,58,.28); padding: 16px 18px; font-size: .82rem; }
+.ed-h { font-weight: 800; font-size: .95rem; } .ed-h span { color: var(--muted); font-weight: 700; }
+.ed-s { color: var(--muted); font-weight: 600; margin: 2px 0 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ed-t { margin-bottom: 10px; }
+.ed-pop label { display: block; font-weight: 700; font-size: .72rem; margin-bottom: 10px; }
+.ed-pop input { display: block; width: 100%; box-sizing: border-box; margin-top: 4px; padding: 8px 10px; border: 1px solid #cfd8e6; border-radius: 8px; font: inherit; font-weight: 600; }
+.ed-err { min-height: 1em; color: #b0156f; font-weight: 700; margin-bottom: 6px; }
+.ed-b { display: flex; gap: 8px; }
+.ed-b button { font: inherit; font-weight: 800; border-radius: 99px; padding: 8px 16px; cursor: pointer; border: 1px solid #cfd8e6; background: #fff; color: #0b1b3a; }
+.ed-b .ed-save { background: var(--quantum-blue); border-color: var(--quantum-blue); color: #fff; }
+.ed-b button:disabled { opacity: .5; cursor: default; }

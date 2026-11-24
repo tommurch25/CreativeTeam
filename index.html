@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light" />
   <title>Creative Hub — Quantum</title>
   <link rel="icon" href="assets/logos/favicon_master.svg" />
-  <link rel="stylesheet" href="assets/styles.css?v=205" />
+  <link rel="stylesheet" href="assets/styles.css?v=220" />
   <script src="assets/app.js?v=61" defer></script>
 </head>
 <body>
@@ -39,7 +39,7 @@
       <div class="hero-slides">
         <div class="hero-slide is-active" role="group" aria-roledescription="slide" aria-label="1 of 3" data-mark="assets/logos/favicon_master.svg">
           <div class="eyebrow"><span class="dot"></span> Creative Hub</div>
-          <h1>Welcome to the Quantum Creative Hub, your one stop shop for all things creative!</h1>
+          <h1 id="home-title">Welcome to the Quantum Creative Hub, your one stop shop for all things creative!</h1>
           <p class="lead">Brief in new work, follow jobs, and see how the studio is performing.</p>
           <div class="btn-row">
             <a class="btn btn-rose" href="https://docs.google.com/forms/d/e/1FAIpQLScUKFEaGsRDUsAIvRTebVR2CSDq1slB9nup9yxOrakS-XNvlQ/viewform" target="_blank" rel="noopener">Brief in work ↗</a>
@@ -312,6 +312,22 @@
         dots.forEach(function (d, k) { d.classList.toggle('is-active', k === i); d.setAttribute('aria-selected', k === i ? 'true' : 'false'); });
       }
       go(0);
+    })();
+  </script>
+  <script>
+    // Greet the person by name, using the Quantum Gate sign-in (display only; nothing here is trusted for access)
+    (async function () {
+      try {
+        const r = await fetch('/whoami', { cache: 'no-store' }); const d = await r.json();
+        if (!d || !d.token) return;
+        const b = JSON.parse(decodeURIComponent(escape(atob(d.token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))));
+        let n = String(b.name || '').trim().split(/\s+/)[0];
+        if (!n && b.email) n = String(b.email).split('@')[0].split(/[._-]/)[0];
+        if (!n) return;
+        n = n.charAt(0).toUpperCase() + n.slice(1);
+        const h = document.getElementById('home-title');
+        if (h) h.textContent = 'Hi ' + n + ', welcome to the Quantum Creative Hub, your one stop shop for all things creative!';
+      } catch (e) { /* not signed in via the Gate: keep the standard welcome */ }
     })();
   </script>
 </body>
